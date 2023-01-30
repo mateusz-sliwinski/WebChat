@@ -1,0 +1,28 @@
+DEBUG = False
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'postgres',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
+    },
+}
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = (
+    '',
+    '',
+)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # console or smtp
+# ACCOUNT_EMAIL_VERIFICATION = "none"
+EMAIL_HOST_USER = ''
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+Email_USE_SSL = False
+EMAIL_HOST_PASSWORD = ''
+
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
