@@ -156,6 +156,7 @@ REST_AUTH_REGISTER_SERIALIZERS = {
 AUTH_USER_MODEL = 'accounts.Users'
 
 ACCOUNT_ADAPTER = 'accounts.adapter.CustomAccountAdapter'
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
