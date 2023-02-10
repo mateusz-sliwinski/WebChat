@@ -1,15 +1,24 @@
+# Standard Library
 import http
 
+# 3rd-party
 from rest_framework import status
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+# Project
 from accounts.models import Users
-from board.models import Post, Comment, PostLikes
+from board.models import Comment
+from board.models import Post
+from board.models import PostLikes
 from board.permissions import IsOwnerOrReadOnly
-from board.serializers import PostSerializer, CommentSerializer, PostLikeSerializer
+from board.serializers import CommentSerializer
+from board.serializers import PostLikeSerializer
+from board.serializers import PostSerializer
 
 
 class PostList(ListCreateAPIView):

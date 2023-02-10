@@ -1,5 +1,7 @@
+# Django
 from django.db import models
 
+# Project
 from accounts.models import Users
 
 

@@ -1,7 +1,11 @@
+# 3rd-party
 from rest_framework import serializers
 
+# Project
 from accounts.models import Users
-from board.models import Post, Comment, PostLikes
+from board.models import Comment
+from board.models import Post
+from board.models import PostLikes
 
 
 class PostSerializer(serializers.ModelSerializer):
