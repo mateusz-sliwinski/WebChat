@@ -13,6 +13,11 @@ class Post(models.Model):
 
     class Meta:
         ordering = ['created']
+        verbose_name = 'Post'
+        verbose_name_plural = 'Posts'
+
+    def __str__(self):  # noqa: D105
+        return f'{self.title} {self.created} '
 
 
 class Comment(models.Model):
@@ -23,3 +28,13 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ['created']
+        verbose_name = 'Comment'
+        verbose_name_plural = 'Comments'
+
+    def __str__(self):  # noqa: D105
+        return f'{self.post.title}'
+
+
+class PostLikes(models.Model):
+    like_users = models.ForeignKey(Users, related_name='like_user', on_delete=models.CASCADE)
+    like_post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='like_post')
