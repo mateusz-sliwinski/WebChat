@@ -5,12 +5,12 @@ from board.models import Post, Comment
 
 
 class PostSerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner')
+    owner = serializers.ReadOnlyField(source='owner.username')
     comments = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'body', 'owner']
+        fields = ['id', 'title', 'image', 'body', 'owner', 'comments']
 
 
 class UsersPostSerializer(serializers.ModelSerializer):
@@ -19,7 +19,7 @@ class UsersPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Users
-        fields = ['id', 'username', 'posts']
+        fields = ['id', 'username', 'posts', 'comments']
 
 
 class CommentSerializer(serializers.ModelSerializer):
