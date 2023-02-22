@@ -5,13 +5,11 @@ import http
 from rest_framework import status
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 # Project
-from accounts.models import Users
 from board.models import Comment
 from board.models import Post
 from board.models import PostLikes
