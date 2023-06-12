@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'dj_rest_auth',
     'dj_rest_auth.registration',
     'corsheaders',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -90,6 +91,18 @@ TEMPLATES = [
 
 
 WSGI_APPLICATION = 'project.wsgi.application'
+
+#websocets
+ASGI_APPLICATION = "project.routing.application"
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('localhost', 6379)],
+        },
+    },
+}
+
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
