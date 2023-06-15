@@ -37,6 +37,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -56,8 +57,10 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration',
     'corsheaders',
     'chat',
-    'channels',
+
 ]
+
+ASGI_APPLICATION = 'project.asgi.application'
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -91,16 +94,12 @@ TEMPLATES = [
 ]
 
 
-WSGI_APPLICATION = 'project.wsgi.application'
 
-#websockets
+#websockets not in production
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            'hosts': [('localhost', 6379)],
-        },
-    },
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
 }
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases

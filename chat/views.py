@@ -4,7 +4,11 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from rest_framework.response import Response
 from .consumers import ChatConsumer
+from chat.models import ChatMessage, ChatRoom
 
+
+def lobby(request):
+    return render(request, 'chat/lobby.html')
 class ChatAPIView(APIView):
     def get(self, request, room_name, format=None):
         # Pobierz warstwę kanałów
@@ -32,7 +36,7 @@ class MessageAPIView(APIView):
         message_text = request.data.get('message')
 
         # Tworzenie nowej wiadomości
-        message = Message(room_name=room_name, text=message_text)
+        message = ChatMessage(room_name=room_name, text=message_text)
         message.save()
 
         # Wysyłanie wiadomości do grupy pokoju za pomocą warstwy kanałów

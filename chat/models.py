@@ -6,6 +6,7 @@ class ChatMessage(models.Model):
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
 
 class ChatRoom(models.Model):
+    name = models.CharField(max_length=128, default='')
     message_id = models.ForeignKey(ChatMessage, models.CASCADE)
 
 
