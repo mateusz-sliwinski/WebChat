@@ -1,5 +1,5 @@
 -r requirements.txt
-codecov==2.1.12
+codecov==2.1.13
 coloredlogs==15.0.1
 coverage==6.5.0
 django-naomi==0.8
