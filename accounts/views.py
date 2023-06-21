@@ -5,7 +5,7 @@ from django.db.models import Q, Prefetch
 from rest_framework.generics import ListAPIView
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.generics import RetrieveDestroyAPIView
-from rest_framework.generics import UpdateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework import request
 from rest_framework import status
@@ -24,14 +24,14 @@ class FriendshipCreate(ListCreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        print(serializer)
         self.perform_create(serializer)
 
         return Response(
             status=status.HTTP_201_CREATED,
         )
 
-class UpdateFriendship(UpdateAPIView):
+
+class UpdateFriendship(RetrieveUpdateAPIView):
     serializer_class = FriendshipSerializer
     name = 'update_friendship'
 

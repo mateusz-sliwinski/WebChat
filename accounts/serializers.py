@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.tokens import default_token_generator
+from django.db.models import Q
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode as uid_decoder
 
@@ -109,7 +110,7 @@ class FriendshipSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Friendship
-        fields = ['status', 'from_user', 'to_user']
+        fields = ['id', 'status', 'from_user', 'to_user']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -117,3 +118,16 @@ class FriendshipSerializer(serializers.ModelSerializer):
         if request and request.user:
             self.fields['to_user'].queryset = self.fields['to_user'].queryset.exclude(id=request.user.id)
             self.fields['from_user'].queryset = User.objects.filter(id=request.user.id)
+
+    def validate(self, data: dict) -> dict:
+
+        from_user = data.get('from_user').id
+        to_user = data.get('to_user').id
+
+        if Friendship.objects.filter(from_user=from_user, to_user=to_user, status='Blocked').exists():
+            raise serializers.ValidationError("User 1 is blocked by user 2.")
+
+        if Friendship.objects.filter(from_user=from_user, to_user=to_user, status='Accepted').exists():
+            raise serializers.ValidationError("User 1 is already an acquaintance of user 2.")
+
+        return data
