@@ -19,6 +19,8 @@ from dj_rest_auth.views import PasswordResetConfirmView
 from dj_rest_auth.views import PasswordResetView
 from dj_rest_auth.views import UserDetailsView
 
+from accounts.views import FriendshipList
+
 django.utils.encoding.force_text = force_str
 
 urlpatterns = [
@@ -81,5 +83,10 @@ urlpatterns = [
         'token/refresh/',
         get_refresh_view().as_view(),
         name='token_refresh',
+    ),
+    path(
+        'friends',
+        FriendshipList.as_view(),
+        name='friends',
     ),
 ]

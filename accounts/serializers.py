@@ -18,6 +18,8 @@ from dj_rest_auth.serializers import UserDetailsSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from accounts.models import Friendship
+
 
 class CustomRegisterSerializer(RegisterSerializer):  # noqa D100
     username = None
@@ -31,6 +33,7 @@ class CustomRegisterSerializer(RegisterSerializer):  # noqa D100
         data_dict['first_name'] = self.validated_data.get('first_name', '')
         data_dict['last_name'] = self.validated_data.get('last_name', '')
         return data_dict
+
 
 class CustomUserDetailsSerializer(UserDetailsSerializer):  # noqa D100
     class Meta(UserDetailsSerializer.Meta):  # noqa D102
@@ -90,3 +93,9 @@ class CustomPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):  # n
             raise serializers.ValidationError(self.set_password_form.errors)
 
         return attrs
+
+
+class FriendshipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Friendship
+        fields = '__all__'
