@@ -1,5 +1,5 @@
 # Django
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 
 # 3rd-party
 from rest_framework.generics import ListAPIView
@@ -7,7 +7,9 @@ from rest_framework.generics import ListCreateAPIView
 from rest_framework.generics import RetrieveDestroyAPIView
 from rest_framework.generics import UpdateAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-
+from rest_framework import request
+from rest_framework import status
+from rest_framework.response import Response
 # Project
 from accounts.models import Friendship
 from accounts.serializers import FriendshipSerializer
@@ -18,6 +20,16 @@ class FriendshipCreate(ListCreateAPIView):
     serializer_class = FriendshipSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
+    def create(self, request: request.Request, *args: tuple, **kwargs: dict) -> Response:  # noqa D102
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        print(serializer)
+        self.perform_create(serializer)
+
+        return Response(
+            status=status.HTTP_201_CREATED,
+        )
 
 class UpdateFriendship(UpdateAPIView):
     serializer_class = FriendshipSerializer

@@ -3,7 +3,7 @@
 from django.contrib import admin
 
 # Project
-from accounts.models import Users
+from accounts.models import Users, Friendship
 
 
 @admin.register(Users)
@@ -23,3 +23,7 @@ class UsersAdmin(admin.ModelAdmin):  # noqa D101
         'first_name',
         'last_name',
     ]
+
+@admin.register(Friendship)
+class FriendsAdmin(admin.ModelAdmin):  # noqa D101
+    pass

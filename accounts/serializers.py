@@ -96,7 +96,24 @@ class CustomPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):  # n
         return attrs
 
 
+User = get_user_model()
+
+
 class FriendshipSerializer(serializers.ModelSerializer):
+    to_user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+    )
+    from_user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.none()
+    )
+
     class Meta:
         model = Friendship
-        fields = '__all__'
+        fields = ['status', 'from_user', 'to_user']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get('request', None)
+        if request and request.user:
+            self.fields['to_user'].queryset = self.fields['to_user'].queryset.exclude(id=request.user.id)
+            self.fields['from_user'].queryset = User.objects.filter(id=request.user.id)
