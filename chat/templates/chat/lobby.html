@@ -15,7 +15,7 @@ chat
 <div id="messages"></div>
 
 <script type="text/javascript">
-     let url = 'ws://'+window.location.host+'/ws/socket-server/';
+     let url = 'ws://'+window.location.host+'/ws/s/';
 
      const chatSocket = new WebSocket(url);
 
@@ -36,7 +36,8 @@ chat
          e.preventDefault()
          let message = e.target.message.value
          chatSocket.send(JSON.stringify({
-             'message': message
+             'message': message,
+             'command': 'fetch_messages'
          }))
          form.reset()
      })
