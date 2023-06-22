@@ -5,7 +5,6 @@ import django
 from django.urls import path
 from django.urls import re_path
 from django.utils.encoding import force_str
-from django.views.generic import TemplateView
 
 # 3rd-party
 from allauth.account.views import ConfirmEmailView
@@ -91,7 +90,7 @@ urlpatterns = [
         name='token_refresh',
     ),
     path(
-        'friends',
+        'friends/',
         FriendshipCreate.as_view(),
         name='friends',
     ),
