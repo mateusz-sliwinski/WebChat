@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.tokens import default_token_generator
+from django.db.models import Q
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode as uid_decoder
 
@@ -17,6 +18,9 @@ from dj_rest_auth.serializers import PasswordResetSerializer
 from dj_rest_auth.serializers import UserDetailsSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+
+# Project
+from accounts.models import Friendship
 
 
 class CustomRegisterSerializer(RegisterSerializer):  # noqa D100
@@ -31,6 +35,7 @@ class CustomRegisterSerializer(RegisterSerializer):  # noqa D100
         data_dict['first_name'] = self.validated_data.get('first_name', '')
         data_dict['last_name'] = self.validated_data.get('last_name', '')
         return data_dict
+
 
 class CustomUserDetailsSerializer(UserDetailsSerializer):  # noqa D100
     class Meta(UserDetailsSerializer.Meta):  # noqa D102
@@ -90,3 +95,39 @@ class CustomPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):  # n
             raise serializers.ValidationError(self.set_password_form.errors)
 
         return attrs
+
+
+User = get_user_model()
+
+
+class FriendshipSerializer(serializers.ModelSerializer):
+    to_user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+    )
+    from_user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.none()
+    )
+
+    class Meta:
+        model = Friendship
+        fields = ['id', 'status', 'from_user', 'to_user']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get('request', None)
+        if request and request.user:
+            self.fields['to_user'].queryset = self.fields['to_user'].queryset.exclude(id=request.user.id)
+            self.fields['from_user'].queryset = User.objects.filter(id=request.user.id)
+
+    def validate(self, data: dict) -> dict:
+
+        from_user = data.get('from_user').id
+        to_user = data.get('to_user').id
+
+        if Friendship.objects.filter(from_user=from_user, to_user=to_user, status='Blocked').exists():
+            raise serializers.ValidationError("User 1 is blocked by user 2.")
+
+        if Friendship.objects.filter(from_user=from_user, to_user=to_user, status='Accepted').exists():
+            raise serializers.ValidationError("User 1 is already an acquaintance of user 2.")
+
+        return data
