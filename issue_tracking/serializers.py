@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from models import Report, Feedback
+from issue_tracking.models import Report, Feedback
 
 
 class ReportSerializer(serializers.ModelSerializer):
