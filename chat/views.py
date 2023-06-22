@@ -1,52 +1,39 @@
-from django.shortcuts import render
-from rest_framework.views import APIView
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-from rest_framework.response import Response
-from .consumers import ChatConsumer
-from chat.models import ChatMessage, ChatRoom
+from rest_framework import permissions
+from rest_framework.generics import (ListAPIView,
+                                     RetrieveAPIView,
+                                     CreateAPIView,
+                                     DestroyAPIView,
+                                     UpdateAPIView)
+
+from .models import Chat, Contact
+from .serializers import ChatSerializer
 
 
-def lobby(request):
-    return render(request, 'chat/lobby.html')
-class ChatAPIView(APIView):
-    def get(self, request, room_name, format=None):
-        # Pobierz warstwę kanałów
-        channel_layer = get_channel_layer()
+class ChatListView(ListAPIView):
+    queryset = Chat.objects.all()
+    serializer_class = ChatSerializer
+    permission_classes = (permissions.AllowAny,)
 
-        # Utwórz konsumenta czatu
-        chat_consumer = ChatConsumer()
 
-        # Połącz konsumenta z pokojem
-        async_to_sync(channel_layer.group_add)(
-            'chat_%s' % room_name,
-            chat_consumer.channel_name
-        )
+class ChatDetailView(RetrieveAPIView):
+    queryset = Chat.objects.all()
+    serializer_class = ChatSerializer
+    permission_classes = (permissions.AllowAny,)
 
-        # Przetwarzaj żądania WebSocket
-        chat_consumer.scope = self.request.scope
-        chat_consumer.connection = self.request.connection
-        chat_consumer.handle()
 
-        return Response(status=200)
+class ChatCreateView(CreateAPIView):
+    queryset = Chat.objects.all()
+    serializer_class = ChatSerializer
+    permission_classes = (permissions.IsAuthenticated,)
 
-class MessageAPIView(APIView):
-    def post(self, request, format=None):
-        room_name = request.data.get('room_name')
-        message_text = request.data.get('message')
 
-        # Tworzenie nowej wiadomości
-        message = ChatMessage(room_name=room_name, text=message_text)
-        message.save()
+class ChatUpdateView(UpdateAPIView):
+    queryset = Chat.objects.all()
+    serializer_class = ChatSerializer
+    permission_classes = (permissions.IsAuthenticated,)
 
-        # Wysyłanie wiadomości do grupy pokoju za pomocą warstwy kanałów
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            'chat_%s' % room_name,
-            {
-                'type': 'chat_message',
-                'message': message_text
-            }
-        )
 
-        return Response(status=201)
+class ChatDeleteView(DestroyAPIView):
+    queryset = Chat.objects.all()
+    serializer_class = ChatSerializer
+    permission_classes = (permissions.IsAuthenticated,)
