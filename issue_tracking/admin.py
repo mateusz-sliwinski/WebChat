@@ -1,7 +1,10 @@
+# Django
 from django.contrib import admin
 
+# Project
 # Register your models here.
-from issue_tracking.models import Report, Feedback
+from issue_tracking.models import Feedback
+from issue_tracking.models import Report
 
 
 @admin.register(Report)

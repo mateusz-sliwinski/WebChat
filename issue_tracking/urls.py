@@ -3,8 +3,9 @@
 # Django
 from django.urls import path
 
-
-from issue_tracking.views import ReportList, FeedbackList
+# Project
+from issue_tracking.views import FeedbackList
+from issue_tracking.views import ReportList
 
 urlpatterns = [
     path('report/', ReportList.as_view()),

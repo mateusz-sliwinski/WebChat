@@ -1,5 +1,9 @@
+# 3rd-party
 from rest_framework import serializers
-from issue_tracking.models import Report, Feedback
+
+# Project
+from issue_tracking.models import Feedback
+from issue_tracking.models import Report
 
 
 class ReportSerializer(serializers.ModelSerializer):
