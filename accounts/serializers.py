@@ -1,17 +1,16 @@
 """Serializers files."""
+import logging
 
 # Django
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.tokens import default_token_generator
-from django.db.models import Q
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode as uid_decoder
 
 # 3rd-party
 from dj_rest_auth.registration.serializers import RegisterSerializer
-# django-rest-auth
 from dj_rest_auth.serializers import LoginSerializer as RestAuthLoginSerializer
 from dj_rest_auth.serializers import PasswordResetConfirmSerializer
 from dj_rest_auth.serializers import PasswordResetSerializer
@@ -22,6 +21,7 @@ from rest_framework.exceptions import ValidationError
 # Project
 from accounts.models import Friendship
 
+logger = logging.getLogger(__name__)
 
 class CustomRegisterSerializer(RegisterSerializer):  # noqa D100
     username = None
@@ -125,9 +125,11 @@ class FriendshipSerializer(serializers.ModelSerializer):
         to_user = data.get('to_user').id
 
         if Friendship.objects.filter(from_user=from_user, to_user=to_user, status='Blocked').exists():
+            logger.info('User Try add blocked Friend')
             raise serializers.ValidationError("User 1 is blocked by user 2.")
 
         if Friendship.objects.filter(from_user=from_user, to_user=to_user, status='Accepted').exists():
+            logger.info('user tried to add a friend he already had')
             raise serializers.ValidationError("User 1 is already an acquaintance of user 2.")
 
         return data

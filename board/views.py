@@ -1,5 +1,3 @@
-# Standard Library
-import http
 
 # 3rd-party
 from rest_framework import status
