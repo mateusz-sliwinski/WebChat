@@ -4,7 +4,6 @@ import uuid as uuid
 # Django
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.urls import reverse
 
 # Project
 from accounts.consts import STATUS_CHOICES
