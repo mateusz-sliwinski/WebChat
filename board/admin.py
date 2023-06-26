@@ -1,6 +1,10 @@
+# Django
 from django.contrib import admin
 
-from board.models import Post, Comment, PostLikes
+# Project
+from board.models import Comment
+from board.models import Post
+from board.models import PostLikes
 
 
 @admin.register(Post)

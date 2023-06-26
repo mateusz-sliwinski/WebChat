@@ -1,7 +1,15 @@
+# Django
 from django.urls import path
+
+# 3rd-party
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from board.views import PostList, PostDetail, CommentList, CommentDetail, LikeListCreate
+# Project
+from board.views import CommentDetail
+from board.views import CommentList
+from board.views import LikeListCreate
+from board.views import PostDetail
+from board.views import PostList
 
 urlpatterns= [
     path('posts/', PostList.as_view()),

@@ -5,7 +5,6 @@ import django
 from django.urls import path
 from django.urls import re_path
 from django.utils.encoding import force_str
-from django.views.generic import TemplateView
 
 # 3rd-party
 from allauth.account.views import ConfirmEmailView
@@ -18,6 +17,14 @@ from dj_rest_auth.views import PasswordChangeView
 from dj_rest_auth.views import PasswordResetConfirmView
 from dj_rest_auth.views import PasswordResetView
 from dj_rest_auth.views import UserDetailsView
+
+# Project
+from accounts.views import BlockedFriendship
+from accounts.views import DeleteFriendship
+from accounts.views import FriendshipCreate
+from accounts.views import GetUserFriendship
+from accounts.views import PendingFriendship
+from accounts.views import UpdateFriendship
 
 django.utils.encoding.force_text = force_str
 
@@ -81,5 +88,35 @@ urlpatterns = [
         'token/refresh/',
         get_refresh_view().as_view(),
         name='token_refresh',
+    ),
+    path(
+        'friends/',
+        FriendshipCreate.as_view(),
+        name='friends',
+    ),
+    path(
+        'friends/update/<int:pk>',
+        UpdateFriendship.as_view(),
+        name='friends_update',
+    ),
+    path(
+        'friends/list/',
+        GetUserFriendship.as_view(),
+        name='friends_list',
+    ),
+    path(
+        'friends/pending/',
+        PendingFriendship.as_view(),
+        name='friends_pending',
+    ),
+    path(
+        'friends/blocked/',
+        BlockedFriendship.as_view(),
+        name='blocked_pending',
+    ),
+    path(
+        'friends/delete/<int:pk>',
+        DeleteFriendship.as_view(),
+        name='blocked_pending',
     ),
 ]
