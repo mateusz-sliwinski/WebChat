@@ -81,7 +81,7 @@ urlpatterns = [
         name='password_change',
     ),
     path(
-        'user/<uuid:uuid>',
+        'user/<uuid:pk>',
         UserDetailsView.as_view(),
     ),
     path(
