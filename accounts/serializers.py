@@ -21,6 +21,7 @@ from rest_framework.exceptions import ValidationError
 
 # Project
 from accounts.models import Friendship
+from accounts.models import Users
 
 
 class CustomRegisterSerializer(RegisterSerializer):  # noqa D100
@@ -131,3 +132,13 @@ class FriendshipSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("User 1 is already an acquaintance of user 2.")
 
         return data
+
+
+class UsersSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Users
+        fields = ['first_name', 'last_name', 'last_login', 'date_joined', 'birth_date']
+        extra_kwargs = {
+            'last_login': {'read_only': True},
+            'date_joined': {'read_only': True},
+        }

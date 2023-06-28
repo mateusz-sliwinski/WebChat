@@ -4,14 +4,18 @@ from django.db.models import Q
 # 3rd-party
 from rest_framework.generics import ListAPIView
 from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import RetrieveAPIView
 from rest_framework.generics import RetrieveDestroyAPIView
 from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 # Project
 from accounts.models import Friendship
+from accounts.models import Users
 from accounts.serializers import FriendshipSerializer
+from accounts.serializers import UsersSerializers
 
 
 class FriendshipCreate(ListCreateAPIView):
@@ -36,7 +40,7 @@ class UpdateFriendship(RetrieveUpdateAPIView):
         serializer.save()
         status_invitations = request.data.get('status')
         'The logic for creating a chat room for a user who accepts their friend if it is "Accepted" during Update is ' \
-            'to create a chat room'
+        'to create a chat room'
 
         return Response(serializer.data)
 
@@ -78,3 +82,12 @@ class DeleteFriendship(RetrieveDestroyAPIView):
     def get_queryset(self):  # noqa D102
         queryset = Friendship.objects.filter(Q(from_user=self.request.user.id) and Q(status='Accepted'))
         return queryset
+
+
+class GetUserInformation(RetrieveUpdateAPIView):
+    serializer_class = UsersSerializers
+    name = 'profile'
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Users.objects.filter(id=self.request.user.id)

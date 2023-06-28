@@ -2,7 +2,8 @@
 from django.db import models
 
 # Project
-from accounts.models import Users, UUIDMixin
+from accounts.models import Users
+from accounts.models import UUIDMixin
 
 
 # Create your models here.
