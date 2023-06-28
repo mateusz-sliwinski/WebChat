@@ -13,10 +13,10 @@ from board.views import PostList
 
 urlpatterns= [
     path('posts/', PostList.as_view()),
-    path('posts/<int:pk>/', PostDetail.as_view()),
+    path('posts/<uuid:pk>/', PostDetail.as_view()),
     path('comments/', CommentList.as_view()),
-    path('comments/<int:pk>/', CommentDetail.as_view()),
-    path('like/<int:post_id>', LikeListCreate.as_view(), name='like')
+    path('comments/<uuid:pk>/', CommentDetail.as_view()),
+    path('like/<uuid:post_id>', LikeListCreate.as_view(), name='like')
 
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)

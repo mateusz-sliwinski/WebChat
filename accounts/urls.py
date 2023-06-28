@@ -23,6 +23,7 @@ from accounts.views import BlockedFriendship
 from accounts.views import DeleteFriendship
 from accounts.views import FriendshipCreate
 from accounts.views import GetUserFriendship
+from accounts.views import GetUserInformation
 from accounts.views import PendingFriendship
 from accounts.views import UpdateFriendship
 
@@ -81,7 +82,7 @@ urlpatterns = [
         name='password_change',
     ),
     path(
-        'user/<uuid:uuid>',
+        'user/<uuid:pk>',
         UserDetailsView.as_view(),
     ),
     path(
@@ -95,7 +96,7 @@ urlpatterns = [
         name='friends',
     ),
     path(
-        'friends/update/<int:pk>',
+        'friends/update/<uuid:pk>',
         UpdateFriendship.as_view(),
         name='friends_update',
     ),
@@ -115,8 +116,13 @@ urlpatterns = [
         name='blocked_pending',
     ),
     path(
-        'friends/delete/<int:pk>',
+        'friends/delete/<uuid:pk>',
         DeleteFriendship.as_view(),
         name='blocked_pending',
+    ),
+    path(
+        'profile/<uuid:pk>',
+        GetUserInformation.as_view(),
+        name='profile',
     ),
 ]
