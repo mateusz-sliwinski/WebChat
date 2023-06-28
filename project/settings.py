@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 # Standard Library
+import logging.config
 import os
 from datetime import timedelta
 from pathlib import Path
@@ -20,12 +21,14 @@ from dotenv import load_dotenv
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from project import logger_formater
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-dotenv_path = os.path.join('.env')
+dotenv_path = os.path.join('..env')
 load_dotenv(dotenv_path)
 
 SECRET_KEY = str(os.getenv('SECRET_KEY'))
@@ -120,17 +123,30 @@ LOGGING = {
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'console_formatter',
         },
         'file': {
             'class': 'logging.FileHandler',
-            'filename': 'test.log',
+            'filename': 'log/app.log',
+            'formatter': 'file_formatter',
+        },
+    },
+    'formatters': {
+        'console_formatter': {
+            'format': '[%(levelname)s][CONSOLE][%(message)s]',
+            '()': logger_formater.CustomFormatter
+        },
+        'file_formatter': {
+            'format': '[%(levelname)s][FILE][%(message)s]',
+            '()': logger_formater.CustomFormatter
         },
     },
     'root': {
         'handlers': ['console', 'file'],
-        'level': 'INFO',  # Wybierz poziom logowania (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+        'level': 'DEBUG',  # Wybierz poziom logowania (DEBUG, INFO, WARNING, ERROR, CRITICAL)
     },
 }
+
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
