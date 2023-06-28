@@ -2,11 +2,11 @@
 from django.db import models
 
 # Project
-from accounts.models import Users
+from accounts.models import Users, UUIDMixin
 
 
 # Create your models here.
-class Post(models.Model):
+class Post(UUIDMixin, models.Model):
     created = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=100, blank=True, default='')
     image = models.ImageField(blank=True, null=True)
@@ -22,7 +22,7 @@ class Post(models.Model):
         return f'{self.title} {self.created} '
 
 
-class Comment(models.Model):
+class Comment(UUIDMixin, models.Model):
     created = models.DateTimeField(auto_now_add=True)
     body = models.TextField(blank=False)
     owner = models.ForeignKey(Users, related_name='comments', on_delete=models.CASCADE)
@@ -37,6 +37,6 @@ class Comment(models.Model):
         return f'{self.post.title}'
 
 
-class PostLikes(models.Model):
+class PostLikes(UUIDMixin, models.Model):
     like_users = models.ForeignKey(Users, related_name='like_user', on_delete=models.CASCADE)
     like_post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='like_post')

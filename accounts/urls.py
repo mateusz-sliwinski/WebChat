@@ -95,7 +95,7 @@ urlpatterns = [
         name='friends',
     ),
     path(
-        'friends/update/<int:pk>',
+        'friends/update/<uuid:pk>',
         UpdateFriendship.as_view(),
         name='friends_update',
     ),
@@ -115,7 +115,7 @@ urlpatterns = [
         name='blocked_pending',
     ),
     path(
-        'friends/delete/<int:pk>',
+        'friends/delete/<uuid:pk>',
         DeleteFriendship.as_view(),
         name='blocked_pending',
     ),
