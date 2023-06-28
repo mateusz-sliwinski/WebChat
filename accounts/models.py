@@ -11,14 +11,14 @@ from accounts.consts import STATUS_CHOICES
 
 
 class UUIDMixin(models.Model):
-    id = models.UUIDField(default=uuid.uuid4(), primary_key=True, editable=False, unique=True, verbose_name='ID')
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False, unique=True, verbose_name='ID')
 
     class Meta:
         abstract = True
 
 
 class Users(AbstractUser):
-    id = models.UUIDField(default=uuid.uuid4(), primary_key=True, editable=False, unique=True, verbose_name='ID')
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False, unique=True, verbose_name='ID')
     birth_date = models.DateField(blank=True, null=True)
 
     class Meta:  # noqa: D106
