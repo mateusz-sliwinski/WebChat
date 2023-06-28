@@ -19,7 +19,6 @@ from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 from project import logger_formater
 
@@ -49,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts.apps.AccountsConfig',
     'board.apps.BoardConfig',
+    'issue_tracking.apps.IssueTrackingConfig',
 
     'allauth',
     'allauth.account',
