@@ -1,4 +1,5 @@
 # chat/views.py
+# Django
 from django.shortcuts import render
 
 

@@ -4,7 +4,6 @@ from django.db.models import Q
 # 3rd-party
 from rest_framework.generics import ListAPIView
 from rest_framework.generics import ListCreateAPIView
-from rest_framework.generics import RetrieveAPIView
 from rest_framework.generics import RetrieveDestroyAPIView
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated

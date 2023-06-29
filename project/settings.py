@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts.apps.AccountsConfig',
     'board.apps.BoardConfig',
+    'chat.apps.ChatConfig',
     'issue_tracking.apps.IssueTrackingConfig',
 
     'allauth',

@@ -9,8 +9,6 @@ from django.urls import path
 # Project
 from project import settings
 
-
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('accounts.urls')),

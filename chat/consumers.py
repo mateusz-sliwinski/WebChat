@@ -1,6 +1,8 @@
 # chat/consumers.py
+# Standard Library
 import json
 
+# 3rd-party
 from channels.generic.websocket import WebsocketConsumer
 
 
