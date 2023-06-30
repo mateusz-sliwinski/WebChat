@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 # Standard Library
-import logging.config
 import os
 from datetime import timedelta
 from pathlib import Path
@@ -19,6 +18,7 @@ from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
 
+# Project
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 from project import logger_formater
 
@@ -134,11 +134,11 @@ LOGGING = {
     'formatters': {
         'console_formatter': {
             'format': '[%(levelname)s][CONSOLE][%(message)s]',
-            '()': logger_formater.CustomFormatter
+            '()': logger_formater.CustomFormatter,
         },
         'file_formatter': {
             'format': '[%(levelname)s][%(message)s]',
-            '()': logger_formater.CustomFormatter
+            '()': logger_formater.CustomFormatter,
         },
     },
     'root': {
@@ -164,11 +164,11 @@ LOGGING_ADMIN = {
     'formatters': {
         'console_formatter': {
             'format': '[%(levelname)s][CONSOLE][%(message)s]',
-            '()': logger_formater.CustomFormatter
+            '()': logger_formater.CustomFormatter,
         },
         'file_formatter': {
             'format': '[%(levelname)s][%(message)s]',
-            '()': logger_formater.CustomFormatter
+            '()': logger_formater.CustomFormatter,
         },
     },
     'root': {
@@ -213,7 +213,8 @@ REST_AUTH = {
     'LOGIN_SERIALIZER': 'accounts.serializers.LoginSerializer',
     'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
     'PASSWORD_RESET_SERIALIZER': 'accounts.serializers.CustomPasswordResetSerializer',
-    'PASSWORD_RESET_CONFIRM_SERIALIZER': 'accounts.serializers.CustomPasswordResetConfirmSerializer',
+    'PASSWORD_RESET_CONFIRM_SERIALIZER':
+        'accounts.serializers.CustomPasswordResetConfirmSerializer',
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer',
     'USE_JWT': True,
     'JWT_AUTH_COOKIE': 'access-token',

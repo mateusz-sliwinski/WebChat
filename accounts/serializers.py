@@ -1,4 +1,5 @@
 """Serializers files."""
+# Standard Library
 import logging
 
 # Django
@@ -25,7 +26,7 @@ from accounts.models import Users
 logger = logging.getLogger(__name__)
 
 
-class CustomRegisterSerializer(RegisterSerializer):  # noqa D100
+class CustomRegisterSerializer(RegisterSerializer):  # noqa D101
     username = None
     first_name = serializers.CharField(required=True, label='First Name', max_length=254)
     last_name = serializers.CharField(required=True, label='Last Name', max_length=254)
@@ -39,7 +40,7 @@ class CustomRegisterSerializer(RegisterSerializer):  # noqa D100
         return data_dict
 
 
-class CustomUserDetailsSerializer(UserDetailsSerializer):  # noqa D100
+class CustomUserDetailsSerializer(UserDetailsSerializer):  # noqa D101
     class Meta(UserDetailsSerializer.Meta):  # noqa D102
         fields = UserDetailsSerializer.Meta.fields + \
                  (
@@ -99,43 +100,56 @@ class CustomPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):  # n
         return attrs
 
 
-class FriendshipSerializer(serializers.ModelSerializer):
+class FriendshipSerializer(serializers.ModelSerializer):  # noqa D101
     to_user = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
     )
     from_user = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.none()
+        queryset=User.objects.none(),
     )
 
-    class Meta:
+    class Meta:  # noqa D106
         model = Friendship
         fields = ['id', 'status', 'from_user', 'to_user']
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args, **kwargs) -> None:  # noqa D107
         super().__init__(*args, **kwargs)
         request = self.context.get('request', None)
         if request and request.user:
-            self.fields['to_user'].queryset = self.fields['to_user'].queryset.exclude(id=request.user.id)
-            self.fields['from_user'].queryset = User.objects.filter(id=request.user.id)
+            self.fields['to_user'].queryset = self.fields['to_user'].queryset.exclude(
+                id=request.user.id,
+            )
 
-    def validate(self, data: dict) -> dict:
+            self.fields['from_user'].queryset = User.objects.filter(
+                id=request.user.id,
+            )
+
+    def validate(self, data: dict) -> dict:  # noqa D105
 
         from_user = data.get('from_user').id
         to_user = data.get('to_user').id
 
-        if Friendship.objects.filter(from_user=from_user, to_user=to_user, status='Blocked').exists():
-            logger.info('User Try add blocked Friend')
-            raise serializers.ValidationError("User 1 is blocked by user 2.")
+        if Friendship.objects.filter(
+                from_user=from_user,
+                to_user=to_user,
+                status='Blocked').exists():
 
-        if Friendship.objects.filter(from_user=from_user, to_user=to_user, status='Accepted').exists():
+            logger.info('User Try add blocked Friend')
+            raise serializers.ValidationError('User 1 is blocked by user 2.')
+
+        if Friendship.objects.filter(
+                from_user=from_user,
+                to_user=to_user,
+                status='Accepted').exists():
+
             logger.info('user tried to add a friend he already had')
-            raise serializers.ValidationError("User 1 is already an acquaintance of user 2.")
+            raise serializers.ValidationError('User 1 is already an acquaintance of user 2.')
 
         return data
 
 
-class UsersSerializers(serializers.ModelSerializer):
-    class Meta:
+class UsersSerializers(serializers.ModelSerializer):  # noqa D101
+    class Meta:  # noqa D106
         model = Users
         fields = ['first_name', 'last_name', 'last_login', 'date_joined', 'birth_date']
         extra_kwargs = {
