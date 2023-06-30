@@ -147,6 +147,35 @@ LOGGING = {
     },
 }
 
+LOGGING_ADMIN = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console_formatter',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'log/admin.log',
+            'formatter': 'file_formatter',
+        },
+    },
+    'formatters': {
+        'console_formatter': {
+            'format': '[%(levelname)s][CONSOLE][%(message)s]',
+            '()': logger_formater.CustomFormatter
+        },
+        'file_formatter': {
+            'format': '[%(levelname)s][%(message)s]',
+            '()': logger_formater.CustomFormatter
+        },
+    },
+    'root': {
+        'handlers': ['console', 'file'],
+        'level': 'INFO',  # Wybierz poziom logowania (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    },
+}
 
 AUTHENTICATION_BACKENDS = [
     'project.admin_authentication_backend.CustomModelBackend',
