@@ -27,7 +27,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-dotenv_path = os.path.join('..env')
+dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
+
 load_dotenv(dotenv_path)
 
 SECRET_KEY = str(os.getenv('SECRET_KEY'))
@@ -91,7 +92,6 @@ TEMPLATES = [
         },
     },
 ]
-
 
 WSGI_APPLICATION = 'project.wsgi.application'
 
@@ -257,7 +257,6 @@ ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
-
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # console or smtp
 EMAIL_HOST_USER = ''
