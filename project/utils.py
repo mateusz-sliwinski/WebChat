@@ -17,4 +17,13 @@ def string_to_code(message: str):
     return cipher_data, cipher.iv
 
 
+def code_to_string(message: bytes, iv: bytes):
+    load_dotenv()
+    PASSWORD = os.environ.get('PASSWORD')
+    PASSWORD_SALT = bytes(os.environ.get('PASSWORD_SALT'), encoding='utf-8')
+    key = PBKDF2(PASSWORD, PASSWORD_SALT, dkLen=32)
 
+    cipher = AES.new(key, AES.MODE_CBC, iv=iv)
+    original = unpad(cipher.decrypt(message), AES.block_size)
+
+    return original
