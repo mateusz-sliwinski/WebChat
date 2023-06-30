@@ -11,19 +11,19 @@ class CustomModelBackend(ModelBackend):
             user = User.objects.get(username=username)
         except User.DoesNotExist:
             # Jeśli użytkownik nie istnieje, możesz wykonać odpowiednie działania, np. zalogować nieudaną próbę logowania.
-            logging.info(f"Failed login attempt for a non-existent user: {username}")
+            logging.critical(f"Failed login attempt for a non-existent user: {username}")
             return None
 
         if not user.is_active:
             # Jeśli użytkownik jest nieaktywny, możesz wykonać odpowiednie działania, np. zalogować nieudaną próbę logowania.
-            logging.info(f"Attempting to log in to an inactive user: {username}")
+            logging.critical(f"Attempting to log in to an inactive user: {username}")
             return None
 
         if user.check_password(password):
             # Hasło jest prawidłowe, można przeprowadzić dodatkowe działania, jeśli to konieczne.
-            logging.info(f"Successful user login: : {username}")
+            logging.critical(f"Successful user login: : {username}")
             return user
         else:
             # Jeśli hasło jest nieprawidłowe, możesz wykonać odpowiednie działania, np. zalogować nieudaną próbę logowania.
-            logging.info(f"Attempting to log in to a user with a bad password: {username}")
+            logging.critical(f"Attempting to log in to a user with a bad password: {username} {password}")
             return None

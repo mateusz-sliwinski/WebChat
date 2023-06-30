@@ -137,13 +137,13 @@ LOGGING = {
             '()': logger_formater.CustomFormatter
         },
         'file_formatter': {
-            'format': '[%(levelname)s][FILE][%(message)s]',
+            'format': '[%(levelname)s][%(message)s]',
             '()': logger_formater.CustomFormatter
         },
     },
     'root': {
         'handlers': ['console', 'file'],
-        'level': 'DEBUG',  # Wybierz poziom logowania (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+        'level': 'WARNING',  # Wybierz poziom logowania (DEBUG, INFO, WARNING, ERROR, CRITICAL)
     },
 }
 
