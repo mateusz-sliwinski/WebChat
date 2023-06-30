@@ -29,18 +29,18 @@ class UpdateFriendship(RetrieveUpdateAPIView):
     name = 'update_friendship'
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def get_queryset(self):  # noqa D102
+    def get_queryset(self) -> dict:  # noqa D102
         queryset = Friendship.objects.filter(to_user=self.request.user.id)
         return queryset
 
-    def update(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs) -> Response:
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         status_invitations = request.data.get('status')
         'The logic for creating a chat room for a user who accepts their friend if it is "Accepted" during Update is ' \
-        'to create a chat room'
+            'to create a chat room'
 
         return Response(serializer.data)
 
@@ -50,7 +50,7 @@ class GetUserFriendship(ListAPIView):
     name = 'list_friendship'
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def get_queryset(self):  # noqa D102
+    def get_queryset(self) -> dict:  # noqa D102
         queryset = Friendship.objects.filter(Q(from_user=self.request.user.id) and Q(status='Accepted'))
         return queryset
 
@@ -60,7 +60,7 @@ class PendingFriendship(ListAPIView):
     name = 'pending_friendship'
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def get_queryset(self):  # noqa D102
+    def get_queryset(self) -> dict:  # noqa D102
         queryset = Friendship.objects.filter(Q(from_user=self.request.user.id) and Q(status='Pending'))
         return queryset
 
@@ -70,7 +70,7 @@ class BlockedFriendship(ListAPIView):
     name = 'blocked_friendship'
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def get_queryset(self):  # noqa D102
+    def get_queryset(self) -> dict:  # noqa D102
         queryset = Friendship.objects.filter(Q(from_user=self.request.user.id) and Q(status='Blocked'))
         return queryset
 
@@ -79,7 +79,7 @@ class DeleteFriendship(RetrieveDestroyAPIView):
     serializer_class = FriendshipSerializer
     name = 'delete_friendship'
 
-    def get_queryset(self):  # noqa D102
+    def get_queryset(self) -> dict:  # noqa D102
         queryset = Friendship.objects.filter(Q(from_user=self.request.user.id) and Q(status='Accepted'))
         return queryset
 
@@ -89,5 +89,5 @@ class GetUserInformation(RetrieveUpdateAPIView):
     name = 'profile'
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
+    def get_queryset(self) -> dict:
         return Users.objects.filter(id=self.request.user.id)

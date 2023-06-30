@@ -143,7 +143,7 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console', 'file'],
-        'level': 'WARNING',  # Wybierz poziom logowania (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+        'level': 'WARNING',
     },
 }
 
@@ -173,7 +173,7 @@ LOGGING_ADMIN = {
     },
     'root': {
         'handlers': ['console', 'file'],
-        'level': 'INFO',  # Wybierz poziom logowania (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+        'level': 'INFO',
     },
 }
 

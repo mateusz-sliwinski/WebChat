@@ -13,7 +13,7 @@ logger_admin = logging.getLogger(__name__)
 
 
 class CustomModelBackend(ModelBackend):
-    def authenticate(self, request, username=None, password=None, **kwargs):
+    def authenticate(self, request, username=None, password=None, **kwargs) -> object | None:
         User = get_user_model()
 
         try:

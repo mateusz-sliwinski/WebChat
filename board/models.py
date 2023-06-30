@@ -19,7 +19,7 @@ class Post(UUIDMixin, models.Model):
         verbose_name = 'Post'
         verbose_name_plural = 'Posts'
 
-    def __str__(self):  # noqa: D105
+    def __str__(self) -> str:  # noqa: D105
         return f'{self.title} {self.created} '
 
 
@@ -34,7 +34,7 @@ class Comment(UUIDMixin, models.Model):
         verbose_name = 'Comment'
         verbose_name_plural = 'Comments'
 
-    def __str__(self):  # noqa: D105
+    def __str__(self) -> str:  # noqa: D105
         return f'{self.post.title}'
 
 

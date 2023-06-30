@@ -24,6 +24,7 @@ from accounts.models import Users
 
 logger = logging.getLogger(__name__)
 
+
 class CustomRegisterSerializer(RegisterSerializer):  # noqa D100
     username = None
     first_name = serializers.CharField(required=True, label='First Name', max_length=254)
@@ -63,26 +64,26 @@ class CustomPasswordResetSerializer(PasswordResetSerializer):  # noqa D101
         opts.update(self.get_email_options())
         self.reset_form.save(**opts)
 
-    def validate_email(self, value):  # noqa D102
+    def validate_email(self, value) -> serializers.ValidationError:  # noqa D102
         self.reset_form = PasswordResetForm(data=self.initial_data)
         if not self.reset_form.is_valid():
             raise serializers.ValidationError(self.reset_form.errors)
 
-    def get_email_options(self):  # noqa D102
+    def get_email_options(self) -> dict:  # noqa D102
         return {
             'email_template_name': 'message/password_reset_message.txt',
         }
 
 
-UserModel = get_user_model()
+User = get_user_model()
 
 
 class CustomPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):  # noqa D101
     def validate(self, attrs: dict) -> dict:  # noqa D102
         try:
             uid = force_str(uid_decoder(attrs['uid']))
-            self.user = UserModel._default_manager.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
+            self.user = User._default_manager.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             raise ValidationError({'uid': ['Invalid value']})
 
         if not default_token_generator.check_token(self.user, attrs['token']):
@@ -98,9 +99,6 @@ class CustomPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):  # n
         return attrs
 
 
-User = get_user_model()
-
-
 class FriendshipSerializer(serializers.ModelSerializer):
     to_user = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
@@ -113,7 +111,7 @@ class FriendshipSerializer(serializers.ModelSerializer):
         model = Friendship
         fields = ['id', 'status', 'from_user', 'to_user']
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         request = self.context.get('request', None)
         if request and request.user:

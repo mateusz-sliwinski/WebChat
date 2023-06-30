@@ -11,7 +11,7 @@ from board.views import LikeListCreate
 from board.views import PostDetail
 from board.views import PostList
 
-urlpatterns= [
+urlpatterns = [
     path('posts/', PostList.as_view()),
     path('posts/<uuid:pk>/', PostDetail.as_view()),
     path('comments/', CommentList.as_view()),

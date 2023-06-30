@@ -24,7 +24,7 @@ class Users(AbstractUser):
         verbose_name = 'User'
         verbose_name_plural = 'Users'
 
-    def __str__(self):  # noqa: D105
+    def __str__(self) -> str:  # noqa: D105
         return f'{self.first_name} {self.last_name} '
 
 
@@ -35,5 +35,5 @@ class Friendship(UUIDMixin, models.Model):
     added_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
-    def __str__(self):  # noqa: D105
+    def __str__(self) -> str:  # noqa: D105
         return f'{self.from_user} {self.to_user} '
