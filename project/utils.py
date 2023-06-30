@@ -5,25 +5,30 @@ from dotenv import load_dotenv
 import os
 
 
+def get_password_data():
+    load_dotenv()
+    PASSWORD = os.environ.get('PASSWORD')
+    PASSWORD_SALT = bytes(os.environ.get('PASSWORD_SALT'), encoding='utf-8')
+
+    return PASSWORD, PASSWORD_SALT
+
+
 def string_to_code(message: str):
-    load_dotenv()
-    PASSWORD = os.environ.get('PASSWORD')
-    PASSWORD_SALT = bytes(os.environ.get('PASSWORD_SALT'), encoding='utf-8')
-    key = PBKDF2(PASSWORD, PASSWORD_SALT, dkLen=32)
+    PASSWORD, PASSWORD_SALT = get_password_data()
 
+    key = PBKDF2(PASSWORD, PASSWORD_SALT, dkLen=32)
     cipher = AES.new(key, AES.MODE_CBC)
-    cipher_data = cipher.encrypt(pad(bytes(message, encoding='utf-8'), AES.block_size))
+    encrypted_message = cipher.encrypt(pad(bytes(message, encoding='utf-8'), AES.block_size))
+    initialization_vector = cipher.iv
 
-    return cipher_data, cipher.iv
+    return encrypted_message, initialization_vector
 
 
-def code_to_string(message: bytes, iv: bytes):
-    load_dotenv()
-    PASSWORD = os.environ.get('PASSWORD')
-    PASSWORD_SALT = bytes(os.environ.get('PASSWORD_SALT'), encoding='utf-8')
+def code_to_string(encrypted_message: bytes, initialization_vector: bytes):
+    PASSWORD, PASSWORD_SALT = get_password_data()
+
     key = PBKDF2(PASSWORD, PASSWORD_SALT, dkLen=32)
+    cipher = AES.new(key, AES.MODE_CBC, iv=initialization_vector)
+    decrypted_message = unpad(cipher.decrypt(encrypted_message), AES.block_size)
 
-    cipher = AES.new(key, AES.MODE_CBC, iv=iv)
-    original = unpad(cipher.decrypt(message), AES.block_size)
-
-    return original
+    return decrypted_message
