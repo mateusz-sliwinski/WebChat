@@ -18,13 +18,17 @@ from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
 
+# Project
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from project import logger_formater
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-dotenv_path = os.path.join('.env')
+dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
+
 load_dotenv(dotenv_path)
 
 SECRET_KEY = str(os.getenv('SECRET_KEY'))
@@ -89,7 +93,6 @@ TEMPLATES = [
     },
 ]
 
-
 WSGI_APPLICATION = 'project.wsgi.application'
 
 # Database
@@ -114,6 +117,65 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console_formatter',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'log/app.log',
+            'formatter': 'file_formatter',
+        },
+    },
+    'formatters': {
+        'console_formatter': {
+            'format': '[%(levelname)s][CONSOLE][%(message)s]',
+            '()': logger_formater.CustomFormatter,
+        },
+        'file_formatter': {
+            'format': '[%(levelname)s][%(message)s]',
+            '()': logger_formater.CustomFormatter,
+        },
+    },
+    'root': {
+        'handlers': ['console', 'file'],
+        'level': 'WARNING',
+    },
+}
+
+LOGGING_ADMIN = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console_formatter',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'log/admin.log',
+            'formatter': 'file_formatter',
+        },
+    },
+    'formatters': {
+        'console_formatter': {
+            'format': '[%(levelname)s][CONSOLE][%(message)s]',
+            '()': logger_formater.CustomFormatter,
+        },
+        'file_formatter': {
+            'format': '[%(levelname)s][%(message)s]',
+            '()': logger_formater.CustomFormatter,
+        },
+    },
+    'root': {
+        'handlers': ['console', 'file'],
+        'level': 'INFO',
+    },
+}
 
 AUTHENTICATION_BACKENDS = [
     'project.admin_authentication_backend.CustomModelBackend',
@@ -151,7 +213,8 @@ REST_AUTH = {
     'LOGIN_SERIALIZER': 'accounts.serializers.LoginSerializer',
     'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
     'PASSWORD_RESET_SERIALIZER': 'accounts.serializers.CustomPasswordResetSerializer',
-    'PASSWORD_RESET_CONFIRM_SERIALIZER': 'accounts.serializers.CustomPasswordResetConfirmSerializer',
+    'PASSWORD_RESET_CONFIRM_SERIALIZER':
+        'accounts.serializers.CustomPasswordResetConfirmSerializer',
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer',
     'USE_JWT': True,
     'JWT_AUTH_COOKIE': 'access-token',
@@ -194,7 +257,6 @@ ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
-
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # console or smtp
 EMAIL_HOST_USER = ''
