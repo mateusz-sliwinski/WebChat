@@ -1,17 +1,41 @@
-# chat/views.py
-# Django
-import json
+from rest_framework import permissions
+from rest_framework.generics import (
+    ListAPIView,
+    RetrieveAPIView,
+    CreateAPIView,
+    DestroyAPIView,
+    UpdateAPIView,
+)
 
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-from django.utils.safestring import mark_safe
+from chat.models import Chat
+from .serializers import ChatSerializer
 
 
-def index(request):
-    return render(request, "index.html")
+class ChatListView(ListAPIView):
+    queryset = Chat.objects.all()
+    serializer_class = ChatSerializer
+    permission_classes = (permissions.AllowAny,)
 
 
-@login_required
-def room(request, room_name):
-    return render(request, "room.html", {"room_name_json": mark_safe(json.dumps(room_name)),
-                                         'username': mark_safe(json.dumps(request.user.username))})
+class ChatDetailView(ListAPIView):
+    queryset = Chat.objects.all()
+    serializer_class = ChatSerializer
+    permission_classes = (permissions.AllowAny,)
+
+
+class ChatDeletelView(DestroyAPIView):
+    queryset = Chat.objects.all()
+    serializer_class = ChatSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+
+class ChatUpdateView(UpdateAPIView):
+    queryset = Chat.objects.all()
+    serializer_class = ChatSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+
+class ChatCreateView(CreateAPIView):
+    queryset = Chat.objects.all()
+    serializer_class = ChatSerializer
+    permission_classes = (permissions.IsAuthenticated,)

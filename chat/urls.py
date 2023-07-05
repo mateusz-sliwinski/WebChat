@@ -1,11 +1,17 @@
-# chat/urls.py
-# Django
-from django.urls import path
+from django.urls import path, re_path
 
-# Local
-from . import views
+from .views import (
+    ChatDetailView,
+    ChatListView,
+    ChatUpdateView,
+    ChatCreateView,
+    ChatDeletelView
+)
 
 urlpatterns = [
-    path("chat/", views.index, name="index"),
-    path("chat/<str:room_name>/", views.room, name="room"),
+    path('', ChatListView.as_view()),
+    path('create/', ChatCreateView.as_view()),
+    path('<pk>', ChatDetailView.as_view()),
+    path('update/<pk>/', ChatUpdateView.as_view()),
+    path('delete/<pk>', ChatDeletelView.as_view()),
 ]
