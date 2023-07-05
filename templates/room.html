@@ -62,16 +62,6 @@
 						</div>
 					</div>
 				</li>
-				<li class="contact active">
-					<div class="wrap">
-						<span class="contact-status busy"></span>
-						<img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
-						<div class="meta">
-							<p class="name">Harvey Specter</p>
-							<p class="preview">Wrong. You take the gun, or you pull out a bigger one. Or, you call their bluff. Or, you do any one of a hundred and forty six other things.</p>
-						</div>
-					</div>
-				</li>
 
 			</ul>
 		</div>
@@ -91,23 +81,15 @@
 			</div>
 		</div>
 		<div class="messages">
-			<ul>
-				<li class="sent">
-					<img src="http://emilcarlsson.se/assets/mikeross.png" alt="" />
-					<p>How the hell am I supposed to get a jury to believe you when I am not even sure that I do?!</p>
-				</li>
-				<li class="replies">
-					<img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
-					<p>When you're backed against the wall, break the god damn thing down.</p>
-				</li>
+			<ul  id="chat-log">
 
 			</ul>
 		</div>
 		<div class="message-input">
 			<div class="wrap">
-			<input type="text" placeholder="Write your message..." />
+			<input id="chat-message-input" type="text" placeholder="Write your message..." />
 			<i class="fa fa-paperclip attachment" aria-hidden="true"></i>
-			<button class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+			<button  id="chat-message-submit" ><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
 			</div>
 		</div>
 	</div>
@@ -129,7 +111,9 @@
     }
 
     chatSocket.onmessage = function(e) {
+        console.log('on message');
         var data = JSON.parse(e.data);
+        console.log(data['command']);
         if (data['command'] === 'messages') {
           for (let i=0; i<data['messages'].length; i++) {
             createMessage(data['messages'][i]);
@@ -143,12 +127,12 @@
         console.error('Chat socket closed unexpectedly');
     };
 
-    document.querySelector('#chat-message-input').onkeyup = function(e) {
-        if (e.keyCode === 13) {  // enter, return
+    document.querySelector('#chat-message-input').onkeydown = function(e) {
+        if (e.keyCode === 13) {
             document.querySelector('#chat-message-submit').click();
         }
     };
-console.log('1');
+
     document.querySelector('#chat-message-submit').onclick = function(e) {
         var messageInputDom = document.getElementById('chat-message-input');
         var message = messageInputDom.value;
@@ -167,6 +151,7 @@ console.log('1');
 
     function createMessage(data) {
       var author = data['author'];
+      console.log('data',data);
       var msgListTag = document.createElement('li');
       var imgTag = document.createElement('img');
       var pTag = document.createElement('p');
