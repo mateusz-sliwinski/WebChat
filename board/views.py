@@ -1,6 +1,4 @@
-# Standard Library
-import http
-
+"""Views files."""
 # 3rd-party
 from rest_framework import status
 from rest_framework.generics import ListCreateAPIView
@@ -19,38 +17,38 @@ from board.serializers import PostLikeSerializer
 from board.serializers import PostSerializer
 
 
-class PostList(ListCreateAPIView):
+class PostList(ListCreateAPIView):  # noqa: D101
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:  # noqa: D102
         serializer.save(owner=self.request.user)
 
 
-class PostDetail(RetrieveUpdateDestroyAPIView):
+class PostDetail(RetrieveUpdateDestroyAPIView):  # noqa: D101
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 
-class CommentList(ListCreateAPIView):
+class CommentList(ListCreateAPIView):  # noqa: D101
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer):  # noqa: D102
         serializer.save(owner=self.request.user)
 
 
-class CommentDetail(RetrieveUpdateDestroyAPIView):
+class CommentDetail(RetrieveUpdateDestroyAPIView):  # noqa: D101
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly,
                           IsOwnerOrReadOnly]
 
 
-class LikeListCreate(APIView):
+class LikeListCreate(APIView):  # noqa: D101
     queryset = PostLikes.objects.all()
     serializer_class = PostLikeSerializer
     name = 'Like'

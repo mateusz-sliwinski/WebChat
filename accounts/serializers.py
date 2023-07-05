@@ -1,17 +1,17 @@
 """Serializers files."""
+# Standard Library
+import logging
 
 # Django
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.tokens import default_token_generator
-from django.db.models import Q
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode as uid_decoder
 
 # 3rd-party
 from dj_rest_auth.registration.serializers import RegisterSerializer
-# django-rest-auth
 from dj_rest_auth.serializers import LoginSerializer as RestAuthLoginSerializer
 from dj_rest_auth.serializers import PasswordResetConfirmSerializer
 from dj_rest_auth.serializers import PasswordResetSerializer
@@ -21,9 +21,12 @@ from rest_framework.exceptions import ValidationError
 
 # Project
 from accounts.models import Friendship
+from accounts.models import Users
+
+logger = logging.getLogger(__name__)
 
 
-class CustomRegisterSerializer(RegisterSerializer):  # noqa D100
+class CustomRegisterSerializer(RegisterSerializer):  # noqa D101
     username = None
     first_name = serializers.CharField(required=True, label='First Name', max_length=254)
     last_name = serializers.CharField(required=True, label='Last Name', max_length=254)
@@ -37,11 +40,11 @@ class CustomRegisterSerializer(RegisterSerializer):  # noqa D100
         return data_dict
 
 
-class CustomUserDetailsSerializer(UserDetailsSerializer):  # noqa D100
+class CustomUserDetailsSerializer(UserDetailsSerializer):  # noqa D101
     class Meta(UserDetailsSerializer.Meta):  # noqa D102
         fields = UserDetailsSerializer.Meta.fields + \
                  (
-                     'is_staff', 'birth_date', 'first_name', 'last_name', 'password', 'uuid',
+                     'is_staff', 'birth_date', 'first_name', 'last_name', 'password',
                  )
 
 
@@ -62,26 +65,26 @@ class CustomPasswordResetSerializer(PasswordResetSerializer):  # noqa D101
         opts.update(self.get_email_options())
         self.reset_form.save(**opts)
 
-    def validate_email(self, value):  # noqa D102
+    def validate_email(self, value) -> serializers.ValidationError:  # noqa D102
         self.reset_form = PasswordResetForm(data=self.initial_data)
         if not self.reset_form.is_valid():
             raise serializers.ValidationError(self.reset_form.errors)
 
-    def get_email_options(self):  # noqa D102
+    def get_email_options(self) -> dict:  # noqa D102
         return {
             'email_template_name': 'message/password_reset_message.txt',
         }
 
 
-UserModel = get_user_model()
+User = get_user_model()
 
 
 class CustomPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):  # noqa D101
     def validate(self, attrs: dict) -> dict:  # noqa D102
         try:
             uid = force_str(uid_decoder(attrs['uid']))
-            self.user = UserModel._default_manager.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
+            self.user = User._default_manager.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             raise ValidationError({'uid': ['Invalid value']})
 
         if not default_token_generator.check_token(self.user, attrs['token']):
@@ -97,37 +100,59 @@ class CustomPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):  # n
         return attrs
 
 
-User = get_user_model()
-
-
-class FriendshipSerializer(serializers.ModelSerializer):
+class FriendshipSerializer(serializers.ModelSerializer):  # noqa D101
     to_user = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
     )
     from_user = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.none()
+        queryset=User.objects.none(),
     )
 
-    class Meta:
+    class Meta:  # noqa D106
         model = Friendship
         fields = ['id', 'status', 'from_user', 'to_user']
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:  # noqa D107
         super().__init__(*args, **kwargs)
         request = self.context.get('request', None)
         if request and request.user:
-            self.fields['to_user'].queryset = self.fields['to_user'].queryset.exclude(id=request.user.id)
-            self.fields['from_user'].queryset = User.objects.filter(id=request.user.id)
+            self.fields['to_user'].queryset = self.fields['to_user'].queryset.exclude(
+                id=request.user.id,
+            )
 
-    def validate(self, data: dict) -> dict:
+            self.fields['from_user'].queryset = User.objects.filter(
+                id=request.user.id,
+            )
+
+    def validate(self, data: dict) -> dict:  # noqa D105
 
         from_user = data.get('from_user').id
         to_user = data.get('to_user').id
 
-        if Friendship.objects.filter(from_user=from_user, to_user=to_user, status='Blocked').exists():
-            raise serializers.ValidationError("User 1 is blocked by user 2.")
+        if Friendship.objects.filter(
+                from_user=from_user,
+                to_user=to_user,
+                status='Blocked').exists():
 
-        if Friendship.objects.filter(from_user=from_user, to_user=to_user, status='Accepted').exists():
-            raise serializers.ValidationError("User 1 is already an acquaintance of user 2.")
+            logger.info('User Try add blocked Friend')
+            raise serializers.ValidationError('User 1 is blocked by user 2.')
+
+        if Friendship.objects.filter(
+                from_user=from_user,
+                to_user=to_user,
+                status='Accepted').exists():
+
+            logger.info('user tried to add a friend he already had')
+            raise serializers.ValidationError('User 1 is already an acquaintance of user 2.')
 
         return data
+
+
+class UsersSerializers(serializers.ModelSerializer):  # noqa D101
+    class Meta:  # noqa D106
+        model = Users
+        fields = ['first_name', 'last_name', 'last_login', 'date_joined', 'birth_date']
+        extra_kwargs = {
+            'last_login': {'read_only': True},
+            'date_joined': {'read_only': True},
+        }
