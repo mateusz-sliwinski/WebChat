@@ -1,3 +1,4 @@
+"""Views files."""
 # Django
 from django.db.models import Q
 
@@ -17,76 +18,84 @@ from accounts.serializers import FriendshipSerializer
 from accounts.serializers import UsersSerializers
 
 
-class FriendshipCreate(ListCreateAPIView):
+class FriendshipCreate(ListCreateAPIView):  # noqa D101
     queryset = Friendship.objects.all()
     serializer_class = FriendshipSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
 
-class UpdateFriendship(RetrieveUpdateAPIView):
+class UpdateFriendship(RetrieveUpdateAPIView):  # noqa D101
     serializer_class = FriendshipSerializer
     name = 'update_friendship'
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def get_queryset(self):  # noqa D102
+    def get_queryset(self) -> dict:  # noqa D102
         queryset = Friendship.objects.filter(to_user=self.request.user.id)
         return queryset
 
-    def update(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs) -> Response:  # noqa D102
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         status_invitations = request.data.get('status')
         'The logic for creating a chat room for a user who accepts their friend if it is "Accepted" during Update is ' \
-        'to create a chat room'
+            'to create a chat room'
 
         return Response(serializer.data)
 
 
-class GetUserFriendship(ListAPIView):
+class GetUserFriendship(ListAPIView):  # noqa D101
     serializer_class = FriendshipSerializer
     name = 'list_friendship'
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def get_queryset(self):  # noqa D102
-        queryset = Friendship.objects.filter(Q(from_user=self.request.user.id) and Q(status='Accepted'))
+    def get_queryset(self) -> dict:  # noqa D102
+        queryset = Friendship.objects.filter(
+            Q(from_user=self.request.user.id) and Q(status='Accepted'),
+        )
         return queryset
 
 
-class PendingFriendship(ListAPIView):
+class PendingFriendship(ListAPIView):  # noqa D101
     serializer_class = FriendshipSerializer
     name = 'pending_friendship'
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def get_queryset(self):  # noqa D102
-        queryset = Friendship.objects.filter(Q(from_user=self.request.user.id) and Q(status='Pending'))
+    def get_queryset(self) -> dict:  # noqa D102
+        queryset = Friendship.objects.filter(
+            Q(from_user=self.request.user.id) and Q(status='Pending'),
+        )
         return queryset
 
 
-class BlockedFriendship(ListAPIView):
+class BlockedFriendship(ListAPIView):  # noqa D101
     serializer_class = FriendshipSerializer
     name = 'blocked_friendship'
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def get_queryset(self):  # noqa D102
-        queryset = Friendship.objects.filter(Q(from_user=self.request.user.id) and Q(status='Blocked'))
+    def get_queryset(self) -> dict:  # noqa D102
+        queryset = Friendship.objects.filter(
+            Q(from_user=self.request.user.id) and Q(status='Blocked'),
+        )
         return queryset
 
 
-class DeleteFriendship(RetrieveDestroyAPIView):
+class DeleteFriendship(RetrieveDestroyAPIView):  # noqa D101
     serializer_class = FriendshipSerializer
     name = 'delete_friendship'
 
-    def get_queryset(self):  # noqa D102
-        queryset = Friendship.objects.filter(Q(from_user=self.request.user.id) and Q(status='Accepted'))
+    def get_queryset(self) -> dict:  # noqa D102
+        queryset = Friendship.objects.filter(
+            Q(from_user=self.request.user.id) and Q(status='Accepted'),
+        )
         return queryset
 
 
-class GetUserInformation(RetrieveUpdateAPIView):
+class GetUserInformation(RetrieveUpdateAPIView):  # noqa D101
     serializer_class = UsersSerializers
     name = 'profile'
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
+    def get_queryset(self) -> dict:  # noqa D102
         return Users.objects.filter(id=self.request.user.id)
