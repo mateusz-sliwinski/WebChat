@@ -10,7 +10,7 @@ from .views import (
 from .views import MessageListView
 
 urlpatterns = [
-    path('', ChatListView.as_view()),
+    path('chat/list', ChatListView.as_view()),
     path('create/', ChatCreateView.as_view()),
     path('<int:pk>/', ChatDetailView.as_view()),
     path('update/<int:pk>/', ChatUpdateView.as_view()),
