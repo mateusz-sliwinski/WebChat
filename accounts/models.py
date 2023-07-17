@@ -44,7 +44,7 @@ class Users(AbstractUser):  # noqa D100
 class Friendship(UUIDMixin, models.Model):  # noqa D100
     from_user = models.ForeignKey(Users, related_name='sender', on_delete=models.CASCADE)
     to_user = models.ForeignKey(Users, related_name='receiver', on_delete=models.CASCADE)
-    status = models.CharField(choices=STATUS_CHOICES, default=1)
+    status = models.CharField(choices=STATUS_CHOICES, default=1, max_length=8)
     added_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
