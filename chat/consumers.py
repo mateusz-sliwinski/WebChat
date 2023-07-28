@@ -18,22 +18,23 @@ def get_current_chat(chatId):
 class ChatConsumer(WebsocketConsumer):
 
     def fetch_messages(self, data):
-
+        print('fetch')
+        print(data)
         messages = ChatMessage.objects.all().filter(participant__chat_id=1)
         print(len(messages))
         for x in messages:
-            print('mess', x.content)
+            print('mess', x.participant, x.content)
         content = {
             'command': 'messages',
             'messages': self.messages_to_json(messages)
         }
+        print(content)
         self.send_message(content)
 
     def new_message(self, data):
-        print(data)
+        print('new message')
 
         author_user = get_user_contact(data['from'])
-        print(author_user)
         message = ChatMessage.objects.create(
             participant=author_user,
             content=data['message'])
@@ -63,6 +64,7 @@ class ChatConsumer(WebsocketConsumer):
     }
 
     def connect(self):
+        print('connect')
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'chat_%s' % self.room_name
         async_to_sync(self.channel_layer.group_add)(
@@ -78,6 +80,8 @@ class ChatConsumer(WebsocketConsumer):
         )
 
     def receive(self, text_data):
+        print('recive')
+        print(text_data)
         data = json.loads(text_data)
         self.commands[data['command']](self, data)
 
