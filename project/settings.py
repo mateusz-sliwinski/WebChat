@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sites',
     'django.contrib.staticfiles',
     'accounts.apps.AccountsConfig',
     'board.apps.BoardConfig',
@@ -221,7 +222,7 @@ CORS_ORIGIN_WHITELIST = (
     '',
 )
 
-FRONT_URL = 'http://127.0.0.1:8000/'
+FRONT_URL = 'http://localhost:4200/'
 
 REST_AUTH = {
     'LOGIN_SERIALIZER': 'accounts.serializers.LoginSerializer',

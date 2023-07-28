@@ -22,7 +22,7 @@ class CustomAccountAdapter(DefaultAccountAdapter):  # noqa D101
 
     def send_mail(self, template_prefix, email, context) -> None:  # noqa D102
         context['activate_url'] = settings.FRONT_URL + \
-                                  'account-confirm-email/' + context['key']
+                                  'activate-account/' + context['key']
 
         msg = self.render_mail(template_prefix, email, context)
         msg.send()
