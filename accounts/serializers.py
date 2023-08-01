@@ -156,3 +156,8 @@ class UsersSerializers(serializers.ModelSerializer):  # noqa D101
             'last_login': {'read_only': True},
             'date_joined': {'read_only': True},
         }
+
+class UsersListSerializers(serializers.ModelSerializer):  # noqa D101
+    class Meta:  # noqa D106
+        model = Users
+        fields = '__all__'
