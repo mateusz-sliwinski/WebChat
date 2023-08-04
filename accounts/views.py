@@ -1,20 +1,23 @@
 """Views files."""
 # Django
 from django.db.models import Q
+import requests
+
+from django.http import QueryDict
 
 # 3rd-party
 from rest_framework.generics import ListAPIView
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.generics import RetrieveDestroyAPIView
 from rest_framework.generics import RetrieveUpdateAPIView, CreateAPIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 # Project
 from accounts.models import Friendship
 from accounts.models import Users
-from accounts.serializers import FriendshipSerializer, UsersListSerializers
+from accounts.serializers import FriendshipSerializer, UsersListSerializers,AddFriendshipSerializer
 from accounts.serializers import UsersSerializers
 from chat.models import Chat, Participant
 
@@ -42,25 +45,28 @@ class UpdateFriendship(RetrieveUpdateAPIView):  # noqa D101
         serializer.save()
         status_invitations = request.data.get('status')
         'The logic for creating a chat room for a user who accepts their friend if it is "Accepted" during Update is ' \
-            'to create a chat room'
+        'to create a chat room'
 
         return Response(serializer.data)
 
+
 class CreateFriendship(CreateAPIView):  # noqa D101
-    serializer_class = FriendshipSerializer
+    serializer_class = AddFriendshipSerializer
     name = 'create_friendship'
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
-        data = request.POST
-        print(data)
-        one = data.get('from_user')
-        two = data.get('to_user')
-        print(one,two)
-        Chat.objects.create()
-
+        # print(request.data)
+        one = request.data.get('from_user')
+        two = request.data.get('to_user')
+        chat = Chat.objects.create()
+        chat.save()
+        Participant.objects.create(user=Users.objects.filter(id=one).get(), chat=chat)
+        Participant.objects.create(user=Users.objects.filter(id=two).get(), chat=chat)
         return self.create(request, *args, **kwargs)
 
+    def perform_create(self, serializer):
+        serializer.save()
 
 class GetUserFriendship(ListAPIView):  # noqa D101
     serializer_class = FriendshipSerializer
