@@ -17,7 +17,7 @@ from rest_framework.response import Response
 # Project
 from accounts.models import Friendship
 from accounts.models import Users
-from accounts.serializers import FriendshipSerializer, UsersListSerializers,AddFriendshipSerializer
+from accounts.serializers import FriendshipSerializer, UsersListSerializers, AddFriendshipSerializer
 from accounts.serializers import UsersSerializers
 from chat.models import Chat, Participant
 
@@ -67,6 +67,7 @@ class CreateFriendship(CreateAPIView):  # noqa D101
 
     def perform_create(self, serializer):
         serializer.save()
+
 
 class GetUserFriendship(ListAPIView):  # noqa D101
     serializer_class = FriendshipSerializer
@@ -125,7 +126,19 @@ class GetUserInformation(RetrieveUpdateAPIView):  # noqa D101
 
 
 class UserList(ListAPIView):  # noqa D101
-    queryset = Users.objects.all()
+
     serializer_class = UsersListSerializers
     name = 'list'
     permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        user = self.request.GET.get('username')
+        friends = Friendship.objects.filter(Q(from_user__username=user) | Q(to_user__username=user))
+        names = []
+        for f in friends:
+            if f.to_user.username not in names:
+                names.append(f.to_user.username)
+            if f.from_user.username not in names:
+                names.append(f.from_user.username)
+
+        return Users.objects.exclude(username__in=names)
