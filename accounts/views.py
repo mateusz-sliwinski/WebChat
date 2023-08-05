@@ -70,15 +70,24 @@ class CreateFriendship(CreateAPIView):  # noqa D101
 
 
 class GetUserFriendship(ListAPIView):  # noqa D101
-    serializer_class = FriendshipSerializer
+    serializer_class = UsersListSerializers
     name = 'list_friendship'
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self) -> dict:  # noqa D102
-        queryset = Friendship.objects.filter(
-            Q(from_user=self.request.user.id) and Q(status='Accepted'),
+        user = self.request.GET.get('username')
+        friends = Friendship.objects.filter(
+            Q(Friendship.objects.filter(Q(from_user__username=user) | Q(to_user__username=user))) and Q(
+                status='Accepted'),
         )
-        return queryset
+        names = []
+
+        for f in friends:
+            if f.to_user.username not in names:
+                names.append(f.to_user.username)
+            if f.from_user.username not in names:
+                names.append(f.from_user.username)
+        return Users.objects.filter(username__in=names)
 
 
 class PendingFriendship(ListAPIView):  # noqa D101

@@ -1,4 +1,4 @@
-from rest_framework import permissions
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from rest_framework.generics import (
@@ -7,13 +7,13 @@ from rest_framework.generics import (
     CreateAPIView,
     DestroyAPIView,
     UpdateAPIView,
-)
-#
-# from chat.models import Chat, Contact, Message
-# from .serializers import ChatSerializer, MessageSerializer
-#
-# User = get_user_model()
-#
+ )
+
+from .serializers import ChatSerializer
+from .models import Chat,Participant
+
+User = get_user_model()
+
 #
 # def get_user_contact(username):
 #     user = get_object_or_404(User, username=username)
@@ -21,17 +21,23 @@ from rest_framework.generics import (
 #     return contact
 #
 #
-# class ChatListView(ListAPIView):
-#     serializer_class = ChatSerializer
-#     permission_classes = (permissions.AllowAny,)
-#
-#     def get_queryset(self):
-#         queryset = Chat.objects.all()
-#         username = self.request.query_params.get('username', None)
-#         if username is not None:
-#             contact = get_user_contact(username)
-#             queryset = contact.chats.all()
-#         return queryset
+class ChatView(ListAPIView):
+    serializer_class = ChatSerializer
+    name = 'room'
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        user = self.request.GET.get('username')
+        current_user = self.request.GET.get('current_user')
+        participants_from_user = Participant.objects.filter(user__username=current_user)
+        participants_to_user = Participant.objects.filter(user__username=user)
+        chat_id = None
+        for participant_from in participants_from_user:
+            for participant_to in participants_to_user:
+                if participant_from.chat == participant_to.chat:
+                    chat_id = participant_from.chat.id
+        queryset = Chat.objects.filter(id=chat_id)
+        return queryset
 #
 #
 # class ChatDetailView(RetrieveAPIView):
