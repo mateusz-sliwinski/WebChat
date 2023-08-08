@@ -75,13 +75,10 @@ class GetUserFriendship(ListAPIView):  # noqa D101
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self) -> dict:  # noqa D102
-        user = self.request.GET.get('username')
-        friends = Friendship.objects.filter(
-            Q(Friendship.objects.filter(Q(from_user__username=user) | Q(to_user__username=user))) and Q(
-                status='Accepted'),
-        )
+        name_user = self.request.GET.get('username')
+        user = Users.objects.get(username=name_user)
+        friends = user.sender.all() | user.receiver.all()
         names = []
-
         for f in friends:
             if f.to_user.username not in names:
                 names.append(f.to_user.username)
