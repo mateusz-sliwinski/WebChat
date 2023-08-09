@@ -3,33 +3,47 @@ import json
 from django.contrib.auth import get_user_model
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
-from .models import Message, Chat
-
+from .models import ChatMessage, Chat, Participant
+from django.shortcuts import get_object_or_404
 from accounts.models import Users
+
+def get_user_contact(username, chatId):
+    user = get_object_or_404(Users, username=username)
+    return get_object_or_404(Participant, user=user, chat=chatId)
+
+def get_current_chat(chatId):
+    return get_object_or_404(Chat, id=chatId)
 
 
 class ChatConsumer(WebsocketConsumer):
 
     def fetch_messages(self, data):
-        obj = Chat()
-        messages = obj.last_10_messages()
-        print(messages)
+        print('fetch')
+        chat_id = data['chatId']
+        messages = ChatMessage.objects.all().filter(participant__chat_id=chat_id)
+        print(len(messages))
+        for x in messages:
+            print('mess', x.participant, x.content)
         content = {
             'command': 'messages',
             'messages': self.messages_to_json(messages)
         }
+        print(content)
         self.send_message(content)
 
     def new_message(self, data):
-        author = data['from']
-        author_user = Users.objects.filter(username=author)[0]
-        message = Message.objects.create(
-            author=author_user,
-            content=data['message'])
+        print('new message')
+        print(data)
+        
+        author_user = get_user_contact(data['username'],data['chatId'])
+        message = ChatMessage.objects.create(
+            participant=author_user,
+            content=data['content'])
         content = {
             'command': 'new_message',
             'message': self.message_to_json(message)
         }
+
         return self.send_chat_message(content)
 
     def messages_to_json(self, messages):
@@ -40,7 +54,7 @@ class ChatConsumer(WebsocketConsumer):
 
     def message_to_json(self, message):
         return {
-            'author': message.author.username,
+            'participant': message.participant.user.username,
             'content': message.content,
             'timestamp': str(message.timestamp)
         }
@@ -51,6 +65,7 @@ class ChatConsumer(WebsocketConsumer):
     }
 
     def connect(self):
+        print('connect')
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'chat_%s' % self.room_name
         async_to_sync(self.channel_layer.group_add)(
@@ -66,6 +81,8 @@ class ChatConsumer(WebsocketConsumer):
         )
 
     def receive(self, text_data):
+        print('recive')
+        print(text_data)
         data = json.loads(text_data)
         self.commands[data['command']](self, data)
 

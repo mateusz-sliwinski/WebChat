@@ -197,10 +197,15 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+        'rest_framework.permissions.IsAuthenticated',
+    ),
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ],
 }
 SIMPLE_JWT = {
@@ -210,10 +215,10 @@ SIMPLE_JWT = {
 
 CSRF_TRUSTED_ORIGINS = ['']
 OLD_PASSWORD_FIELD_ENABLED = True
-REST_USE_JWT = True
+# REST_USE_JWT = True
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-JWT_AUTH_COOKIE = 'access-token'
-JWT_AUTH_REFRESH_COOKIE = 'refresh-token'
+# JWT_AUTH_COOKIE = 'access-token'
+# JWT_AUTH_REFRESH_COOKIE = 'refresh-token'
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = (
@@ -221,7 +226,7 @@ CORS_ORIGIN_WHITELIST = (
     '',
 )
 
-FRONT_URL = 'http://127.0.0.1:8000/'
+FRONT_URL = 'http://localhost:4200/'
 
 REST_AUTH = {
     'LOGIN_SERIALIZER': 'accounts.serializers.LoginSerializer',
@@ -258,7 +263,6 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-SITE_ID = 1
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'apps_static/')
 
