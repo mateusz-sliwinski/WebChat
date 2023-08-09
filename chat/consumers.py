@@ -7,9 +7,9 @@ from .models import ChatMessage, Chat, Participant
 from django.shortcuts import get_object_or_404
 from accounts.models import Users
 
-def get_user_contact(username):
+def get_user_contact(username, chatId):
     user = get_object_or_404(Users, username=username)
-    return get_object_or_404(Participant, user=user)
+    return get_object_or_404(Participant, user=user, chat=chatId)
 
 def get_current_chat(chatId):
     return get_object_or_404(Chat, id=chatId)
@@ -19,8 +19,8 @@ class ChatConsumer(WebsocketConsumer):
 
     def fetch_messages(self, data):
         print('fetch')
-        print(data)
-        messages = ChatMessage.objects.all().filter(participant__chat_id=1)
+        chat_id = data['chatId']
+        messages = ChatMessage.objects.all().filter(participant__chat_id=chat_id)
         print(len(messages))
         for x in messages:
             print('mess', x.participant, x.content)
@@ -33,11 +33,12 @@ class ChatConsumer(WebsocketConsumer):
 
     def new_message(self, data):
         print('new message')
-
-        author_user = get_user_contact(data['from'])
+        print(data)
+        
+        author_user = get_user_contact(data['username'],data['chatId'])
         message = ChatMessage.objects.create(
             participant=author_user,
-            content=data['message'])
+            content=data['content'])
         content = {
             'command': 'new_message',
             'message': self.message_to_json(message)
