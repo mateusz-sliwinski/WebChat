@@ -9,5 +9,4 @@ COPY requirements_dev.txt .
 COPY .env /code/.env
 RUN pip3 install --upgrade pip && pip3 install -r requirements_docker.txt
 ADD . /code
-RUN python manage.py makemigrations
 RUN python manage.py migrate

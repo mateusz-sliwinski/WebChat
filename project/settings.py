@@ -115,7 +115,7 @@ CHANNEL_LAYERS = {
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASE_URL = str(os.getenv('DATABASE'))
-DATABASES = {'default': dj_database_url.config(default=DATABASE_URL)}
+DATABASES = {'default': dj_database_url.parse(DATABASE_URL)}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
