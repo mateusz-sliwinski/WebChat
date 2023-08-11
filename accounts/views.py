@@ -4,6 +4,10 @@ from django.db.models import Q
 import requests
 
 from django.http import QueryDict
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.core.serializers import serialize
+from django.http import JsonResponse
 
 # 3rd-party
 from rest_framework.generics import ListAPIView
@@ -22,10 +26,32 @@ from accounts.serializers import UsersSerializers
 from chat.models import Chat, Participant
 
 
-class FriendshipCreate(ListCreateAPIView):  # noqa D101
+class FriendshipCreate(CreateAPIView):  # noqa D101
+    queryset = Friendship.objects.all()
+    serializer_class = AddFriendshipSerializer
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        one = request.data.get('from_user')
+        two = request.data.get('to_user')
+        print(one)
+        print(two)
+
+        print('post')
+        return self.create(request, *args, **kwargs)
+
+
+class FriendshipList(ListAPIView):  # noqa D101
     queryset = Friendship.objects.all()
     serializer_class = FriendshipSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get(self, request, *args, **kwargs):
+        print('get')
+        return self.list(request, *args, **kwargs)
+
+
+
 
 
 class UpdateFriendship(RetrieveUpdateAPIView):  # noqa D101
@@ -37,7 +63,7 @@ class UpdateFriendship(RetrieveUpdateAPIView):  # noqa D101
         queryset = Friendship.objects.filter(to_user=self.request.user.id)
         return queryset
 
-    def update(self, request, *args, **kwargs) -> Response:  # noqa D102
+    def update(self, request, *args, **kwarsg) -> Response:  # noqa D102
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -77,9 +103,10 @@ class GetUserFriendship(ListAPIView):  # noqa D101
     def get_queryset(self) -> dict:  # noqa D102
         name_user = self.request.GET.get('username')
         user = Users.objects.get(username=name_user)
-        friends = user.sender.all() | user.receiver.all()
+        accepted_friends = user.sender.filter(status='Accepted') | \
+                           user.receiver.filter(status='Accepted')
         names = []
-        for f in friends:
+        for f in accepted_friends:
             if f.to_user.username not in names:
                 names.append(f.to_user.username)
             if f.from_user.username not in names:
@@ -87,16 +114,38 @@ class GetUserFriendship(ListAPIView):  # noqa D101
         return Users.objects.filter(username__in=names)
 
 
-class PendingFriendship(ListAPIView):  # noqa D101
-    serializer_class = FriendshipSerializer
+class PendingFriendship(CreateAPIView, ListAPIView):  # noqa D101
+    queryset = Users.objects.all()
+    serializer_class = UsersSerializers
     name = 'pending_friendship'
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]
 
-    def get_queryset(self) -> dict:  # noqa D102
-        queryset = Friendship.objects.filter(
-            Q(from_user=self.request.user.id) and Q(status='Pending'),
-        )
-        return queryset
+    def post(self, request, *args, **kwargs):
+        print('post')
+        return self.create(request, *args, **kwargs)
+
+    def get_queryset(self):
+        user = self.request.GET.get('username')
+        invs = Friendship.objects.filter(
+            Q(to_user_id=Users.objects.filter(username=user)) and Q(status='Pending'))
+        print(invs)
+        names = []
+        for f in invs:
+            if f.to_user.username not in names:
+                names.append(f.to_user.username)
+            if f.from_user.username not in names:
+                names.append(f.from_user.username)
+        return Users.objects.filter(username__in=names).exclude(username=user)
+
+    # def get_queryset(self) -> dict:  # noqa D102
+    #     # user = Users.objects.filter(id=self.request.user)
+    #     # print(user)
+    #     # queryset = Friendship.objects.filter(
+    #     #     Q(to_user_id=Users.objects.filter(id=self.request.user.id)) and Q(status='Pending'),
+    #     # )
+    #     queryset = Friendship.objects.filter(to_user=self.request.user).filter(status='Pending')
+    #     print(queryset)
+    #     return queryset
 
 
 class BlockedFriendship(ListAPIView):  # noqa D101
@@ -135,7 +184,7 @@ class UserList(ListAPIView):  # noqa D101
 
     serializer_class = UsersListSerializers
     name = 'list'
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         user = self.request.GET.get('username')

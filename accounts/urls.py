@@ -91,45 +91,46 @@ urlpatterns = [
         get_refresh_view().as_view(),
         name='token_refresh',
     ),
-    path(
-        'friends/',
-        FriendshipCreate.as_view(),
-        name='friends',
-    ),
-    path(
-        'friends/update/<uuid:pk>',
-        UpdateFriendship.as_view(),
-        name='friends_update',
-    ),
-    path(
-        'friends/list/',
-        GetUserFriendship.as_view(),
-        name='friends_list',
-    ),
+
+    # path(
+    #     'friends/update/<uuid:pk>',
+    #     UpdateFriendship.as_view(),
+    #     name='friends_update',
+    # ),
+    # path(
+    #     'friends/list/',
+    #     GetUserFriendship.as_view(),
+    #     name='friends_list',
+    # ),
     path(
         'friends/pending/',
         PendingFriendship.as_view(),
         name='friends_pending',
     ),
+    # path(
+    #     'friends/blocked/',
+    #     BlockedFriendship.as_view(),
+    #     name='blocked_pending',
+    # ),
+    # path(
+    #     'friends/delete/<uuid:pk>',
+    #     DeleteFriendship.as_view(),
+    #     name='blocked_pending',
+    # ),
+    # path(
+    #     'friends/create/',
+    #     CreateFriendship.as_view(),
+    #     name='create',
+    # ),
+    # path(
+    #     'profile/<uuid:pk>',
+    #     GetUserInformation.as_view(),
+    #     name='profile',
+    # ),
     path(
-        'friends/blocked/',
-        BlockedFriendship.as_view(),
-        name='blocked_pending',
-    ),
-    path(
-        'friends/delete/<uuid:pk>',
-        DeleteFriendship.as_view(),
-        name='blocked_pending',
-    ),
-    path(
-        'friends/create/',
-        CreateFriendship.as_view(),
-        name='create',
-    ),
-    path(
-        'profile/<uuid:pk>',
-        GetUserInformation.as_view(),
-        name='profile',
+        'friends/',
+        FriendshipCreate.as_view(),
+        name='friends',
     ),
     path(
         'user/list',
