@@ -126,26 +126,12 @@ class PendingFriendship(CreateAPIView, ListAPIView):  # noqa D101
 
     def get_queryset(self):
         user = self.request.GET.get('username')
-        invs = Friendship.objects.filter(
-            Q(to_user_id=Users.objects.filter(username=user)) and Q(status='Pending'))
-        print(invs)
+        invs = Friendship.objects.filter(Q(to_user__username=user) and Q(status='Pending'))
         names = []
         for f in invs:
-            if f.to_user.username not in names:
-                names.append(f.to_user.username)
-            if f.from_user.username not in names:
+            if f.to_user.username == user not in names:
                 names.append(f.from_user.username)
-        return Users.objects.filter(username__in=names).exclude(username=user)
-
-    # def get_queryset(self) -> dict:  # noqa D102
-    #     # user = Users.objects.filter(id=self.request.user)
-    #     # print(user)
-    #     # queryset = Friendship.objects.filter(
-    #     #     Q(to_user_id=Users.objects.filter(id=self.request.user.id)) and Q(status='Pending'),
-    #     # )
-    #     queryset = Friendship.objects.filter(to_user=self.request.user).filter(status='Pending')
-    #     print(queryset)
-    #     return queryset
+        return Users.objects.filter(username__in=names)
 
 
 class BlockedFriendship(ListAPIView):  # noqa D101
