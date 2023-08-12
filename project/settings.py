@@ -34,9 +34,14 @@ load_dotenv(dotenv_path)
 SECRET_KEY = str(os.getenv('SECRET_KEY'))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = 'RENDER' not in os.environ
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
@@ -115,7 +120,11 @@ CHANNEL_LAYERS = {
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASE_URL = str(os.getenv('DATABASE'))
-DATABASES = {'default': dj_database_url.parse(DATABASE_URL)}
+DATABASES = {
+    'default': dj_database_url.config(
+        default=DATABASE_URL,
+        conn_max_age=600)
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -260,7 +269,10 @@ STATICFILES_DIRS = [
 ]
 SITE_ID = 1
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'apps_static/')
+
+if not DEBUG:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'apps_static/')
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
