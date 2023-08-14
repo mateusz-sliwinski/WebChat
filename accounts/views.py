@@ -21,7 +21,8 @@ from rest_framework.response import Response
 # Project
 from accounts.models import Friendship
 from accounts.models import Users
-from accounts.serializers import FriendshipSerializer, UsersListSerializers, AddFriendshipSerializer
+from accounts.serializers import FriendshipSerializer, UsersListSerializers, AddFriendshipSerializer, \
+    UpdateFriendshipSerializer
 from accounts.serializers import UsersSerializers
 from chat.models import Chat, Participant
 
@@ -36,7 +37,6 @@ class FriendshipCreate(CreateAPIView):  # noqa D101
         two = request.data.get('to_user')
         print(one)
         print(two)
-
         print('post')
         return self.create(request, *args, **kwargs)
 
@@ -50,30 +50,6 @@ class FriendshipList(ListAPIView):  # noqa D101
         print('get')
         return self.list(request, *args, **kwargs)
 
-
-
-
-
-class UpdateFriendship(RetrieveUpdateAPIView):  # noqa D101
-    serializer_class = FriendshipSerializer
-    name = 'update_friendship'
-    permission_classes = [IsAuthenticatedOrReadOnly]
-
-    def get_queryset(self) -> dict:  # noqa D102
-        queryset = Friendship.objects.filter(to_user=self.request.user.id)
-        return queryset
-
-    def update(self, request, *args, **kwarsg) -> Response:  # noqa D102
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        print('serializer sdsad', serializer)
-        serializer.save()
-        status_invitations = request.data.get('status')
-        'The logic for creating a chat room for a user who accepts their friend if it is "Accepted" during Update is ' \
-        'to create a chat room'
-
-        return Response(serializer.data)
 
 
 class CreateFriendship(CreateAPIView):  # noqa D101
@@ -96,42 +72,50 @@ class CreateFriendship(CreateAPIView):  # noqa D101
 
 
 class GetUserFriendship(ListAPIView):  # noqa D101
-    serializer_class = UsersListSerializers
+    #list of friends list
+    serializer_class = UpdateFriendshipSerializer
     name = 'list_friendship'
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]
 
     def get_queryset(self) -> dict:  # noqa D102
-        name_user = self.request.GET.get('username')
-        user = Users.objects.get(username=name_user)
-        accepted_friends = user.sender.filter(status='Accepted') | \
-                           user.receiver.filter(status='Accepted')
-        names = []
-        for f in accepted_friends:
-            if f.to_user.username not in names:
-                names.append(f.to_user.username)
-            if f.from_user.username not in names:
-                names.append(f.from_user.username)
-        return Users.objects.filter(username__in=names)
+        uuid = self.request.GET.get('pk')
+        print(uuid)
+        user = Users.objects.get(id=uuid)
+        user_friends = Friendship.objects.filter(
+            Q(from_user=uuid, status='Accepted') | Q(to_user=uuid, status='Accepted')
+        )
+
+        return user_friends
 
 
 class PendingFriendship(CreateAPIView, ListAPIView):  # noqa D101
-    queryset = Users.objects.all()
-    serializer_class = UsersSerializers
+    #list of users who user can accept/reject
+    serializer_class = UpdateFriendshipSerializer
     name = 'pending_friendship'
     permission_classes = [AllowAny]
 
-    def post(self, request, *args, **kwargs):
-        print('post')
-        return self.create(request, *args, **kwargs)
-
     def get_queryset(self):
         user = self.request.GET.get('username')
-        invs = Friendship.objects.filter(Q(to_user__username=user) and Q(status='Pending'))
-        names = []
-        for f in invs:
-            if f.to_user.username == user not in names:
-                names.append(f.from_user.username)
-        return Users.objects.filter(username__in=names)
+        invs = Friendship.objects.filter(to_user__username=user).filter(status='Pending')
+        return invs
+
+
+class UpdateFriendship(RetrieveUpdateAPIView):  # noqa D101
+    queryset = Friendship.objects.all()
+    serializer_class = AddFriendshipSerializer
+    name = 'update_friendship'
+    permission_classes = [AllowAny]
+
+    def put(self, request, *args, **kwargs):
+        # accept invitations and create chat for both
+        from_user = request.data['from_user']
+        to_user = request.data['from_user']
+        print(from_user)
+        chat = Chat.objects.create()
+        chat.save()
+        Participant.objects.create(user=Users.objects.filter(id=from_user).get(), chat=chat)
+        Participant.objects.create(user=Users.objects.filter(id=to_user).get(), chat=chat)
+        return self.update(request, *args, **kwargs)
 
 
 class BlockedFriendship(ListAPIView):  # noqa D101
@@ -167,7 +151,6 @@ class GetUserInformation(RetrieveUpdateAPIView):  # noqa D101
 
 
 class UserList(ListAPIView):  # noqa D101
-
     serializer_class = UsersListSerializers
     name = 'list'
     permission_classes = [AllowAny]

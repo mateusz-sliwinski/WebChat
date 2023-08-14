@@ -10,7 +10,7 @@ from django.urls import path, re_path
 from .views import ChatView
 #
 urlpatterns = [
-    path('room/', ChatView.as_view(), name = ''),
+    path('room/', ChatView.as_view(), name = 'room'),
     # path('create/', ChatCreateView.as_view()),
     # path('<int:pk>/', ChatDetailView.as_view()),
     # path('update/<int:pk>/', ChatUpdateView.as_view()),

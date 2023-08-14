@@ -92,16 +92,16 @@ urlpatterns = [
         name='token_refresh',
     ),
 
-    # path(
-    #     'friends/update/<uuid:pk>',
-    #     UpdateFriendship.as_view(),
-    #     name='friends_update',
-    # ),
-    # path(
-    #     'friends/list/',
-    #     GetUserFriendship.as_view(),
-    #     name='friends_list',
-    # ),
+    path(
+        'friends/update/<uuid:pk>',
+        UpdateFriendship.as_view(),
+        name='friends_update',
+    ),
+    path(
+        'friends/list/',
+        GetUserFriendship.as_view(),
+        name='friends_list',
+    ),
     path(
         'friends/pending/',
         PendingFriendship.as_view(),
