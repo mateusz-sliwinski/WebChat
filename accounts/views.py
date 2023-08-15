@@ -58,7 +58,6 @@ class CreateFriendship(CreateAPIView):  # noqa D101
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
-        # print(request.data)
         one = request.data.get('from_user')
         two = request.data.get('to_user')
         chat = Chat.objects.create()
@@ -75,11 +74,10 @@ class GetUserFriendship(ListAPIView):  # noqa D101
     #list of friends list
     serializer_class = UpdateFriendshipSerializer
     name = 'list_friendship'
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self) -> dict:  # noqa D102
         uuid = self.request.GET.get('pk')
-        print(uuid)
         user = Users.objects.get(id=uuid)
         user_friends = Friendship.objects.filter(
             Q(from_user=uuid, status='Accepted') | Q(to_user=uuid, status='Accepted')
@@ -151,18 +149,17 @@ class GetUserInformation(RetrieveUpdateAPIView):  # noqa D101
 
 
 class UserList(ListAPIView):  # noqa D101
+    # Returns a list of all users who are not in a relationship and with a status of Rejected
     serializer_class = UsersListSerializers
     name = 'list'
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        user = self.request.GET.get('username')
-        friends = Friendship.objects.filter(Q(from_user__username=user) | Q(to_user__username=user))
-        names = []
+        uuid = self.request.user.id
+        friends = Friendship.objects.filter(Q(from_user__id=uuid) | Q(to_user__id=uuid)).exclude(status='Rejected')
+        names = set()
         for f in friends:
-            if f.to_user.username not in names:
-                names.append(f.to_user.username)
-            if f.from_user.username not in names:
-                names.append(f.from_user.username)
+            names.add(f.to_user.username)
+            names.add(f.from_user.username)
 
         return Users.objects.exclude(username__in=names)

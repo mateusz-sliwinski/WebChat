@@ -27,10 +27,9 @@ class ChatView(ListAPIView):
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        user = self.request.GET.get('username')
-        current_user = self.request.GET.get('current_user')
-        print(user)
-        print(current_user)
+        print(self.request.user)
+
+        print(self.request.GET.get('uuid'))
         participants_from_user = Participant.objects.filter(user__username=current_user)
         participants_to_user = Participant.objects.filter(user__username=user)
         chat_id = None
