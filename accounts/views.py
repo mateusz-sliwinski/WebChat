@@ -35,9 +35,11 @@ class FriendshipCreate(CreateAPIView):  # noqa D101
     def post(self, request, *args, **kwargs):
         one = request.data.get('from_user')
         two = request.data.get('to_user')
-        print(one)
-        print(two)
-        print('post')
+        qs = Friendship.objects.filter(Q(from_user__id=one) & Q(to_user__id=two) |
+                                       Q(from_user__id=two) & Q(to_user__id=one))
+        if qs.count() == 1:
+            obj = qs.first()
+            obj.delete()
         return self.create(request, *args, **kwargs)
 
 
@@ -49,7 +51,6 @@ class FriendshipList(ListAPIView):  # noqa D101
     def get(self, request, *args, **kwargs):
         print('get')
         return self.list(request, *args, **kwargs)
-
 
 
 class CreateFriendship(CreateAPIView):  # noqa D101
@@ -71,7 +72,7 @@ class CreateFriendship(CreateAPIView):  # noqa D101
 
 
 class GetUserFriendship(ListAPIView):  # noqa D101
-    #list of friends list
+    # list of friends list
     serializer_class = UpdateFriendshipSerializer
     name = 'list_friendship'
     permission_classes = [IsAuthenticated]
@@ -87,7 +88,7 @@ class GetUserFriendship(ListAPIView):  # noqa D101
 
 
 class PendingFriendship(CreateAPIView, ListAPIView):  # noqa D101
-    #list of users who user can accept/reject
+    # list of users who user can accept/reject
     serializer_class = UpdateFriendshipSerializer
     name = 'pending_friendship'
     permission_classes = [AllowAny]
@@ -99,16 +100,15 @@ class PendingFriendship(CreateAPIView, ListAPIView):  # noqa D101
 
 
 class UpdateFriendship(RetrieveUpdateAPIView):  # noqa D101
+    # accept invitations and create chat for both
     queryset = Friendship.objects.all()
     serializer_class = AddFriendshipSerializer
     name = 'update_friendship'
     permission_classes = [AllowAny]
 
     def put(self, request, *args, **kwargs):
-        # accept invitations and create chat for both
         from_user = request.data['from_user']
         to_user = request.data['from_user']
-        print(from_user)
         chat = Chat.objects.create()
         chat.save()
         Participant.objects.create(user=Users.objects.filter(id=from_user).get(), chat=chat)
