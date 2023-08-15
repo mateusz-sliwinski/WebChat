@@ -19,7 +19,7 @@ from dj_rest_auth.views import PasswordResetView
 from dj_rest_auth.views import UserDetailsView
 
 # Project
-from accounts.views import BlockedFriendship, CreateFriendship
+from accounts.views import BlockedFriendship
 from accounts.views import DeleteFriendship
 from accounts.views import FriendshipCreate
 from accounts.views import GetUserFriendship

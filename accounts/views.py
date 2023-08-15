@@ -28,9 +28,10 @@ from chat.models import Chat, Participant
 
 
 class FriendshipCreate(CreateAPIView):  # noqa D101
+    # Adding a new object to friendship and if it exists, replacing it
     queryset = Friendship.objects.all()
     serializer_class = AddFriendshipSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         one = request.data.get('from_user')
@@ -43,34 +44,6 @@ class FriendshipCreate(CreateAPIView):  # noqa D101
         return self.create(request, *args, **kwargs)
 
 
-class FriendshipList(ListAPIView):  # noqa D101
-    queryset = Friendship.objects.all()
-    serializer_class = FriendshipSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
-
-    def get(self, request, *args, **kwargs):
-        print('get')
-        return self.list(request, *args, **kwargs)
-
-
-class CreateFriendship(CreateAPIView):  # noqa D101
-    serializer_class = AddFriendshipSerializer
-    name = 'create_friendship'
-    permission_classes = [AllowAny]
-
-    def post(self, request, *args, **kwargs):
-        one = request.data.get('from_user')
-        two = request.data.get('to_user')
-        chat = Chat.objects.create()
-        chat.save()
-        Participant.objects.create(user=Users.objects.filter(id=one).get(), chat=chat)
-        Participant.objects.create(user=Users.objects.filter(id=two).get(), chat=chat)
-        return self.create(request, *args, **kwargs)
-
-    def perform_create(self, serializer):
-        serializer.save()
-
-
 class GetUserFriendship(ListAPIView):  # noqa D101
     # list of friends list
     serializer_class = UpdateFriendshipSerializer
@@ -78,12 +51,9 @@ class GetUserFriendship(ListAPIView):  # noqa D101
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self) -> dict:  # noqa D102
-        uuid = self.request.GET.get('pk')
-        user = Users.objects.get(id=uuid)
+        user = self.request.user.id
         user_friends = Friendship.objects.filter(
-            Q(from_user=uuid, status='Accepted') | Q(to_user=uuid, status='Accepted')
-        )
-
+            Q(from_user=user, status='Accepted') | Q(to_user=user, status='Accepted'))
         return user_friends
 
 
@@ -100,19 +70,20 @@ class PendingFriendship(CreateAPIView, ListAPIView):  # noqa D101
 
 
 class UpdateFriendship(RetrieveUpdateAPIView):  # noqa D101
-    # accept invitations and create chat for both
+    # accept invitations and create chat for both or reject/delete
     queryset = Friendship.objects.all()
     serializer_class = AddFriendshipSerializer
     name = 'update_friendship'
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def put(self, request, *args, **kwargs):
-        from_user = request.data['from_user']
-        to_user = request.data['from_user']
-        chat = Chat.objects.create()
-        chat.save()
-        Participant.objects.create(user=Users.objects.filter(id=from_user).get(), chat=chat)
-        Participant.objects.create(user=Users.objects.filter(id=to_user).get(), chat=chat)
+        if self.request.data.get('status') == 'Accepted':
+            from_user = request.data['from_user']
+            to_user = request.data['from_user']
+            chat = Chat.objects.create()
+            chat.save()
+            Participant.objects.create(user=Users.objects.filter(id=from_user).get(), chat=chat)
+            Participant.objects.create(user=Users.objects.filter(id=to_user).get(), chat=chat)
         return self.update(request, *args, **kwargs)
 
 
@@ -152,7 +123,7 @@ class UserList(ListAPIView):  # noqa D101
     # Returns a list of all users who are not in a relationship and with a status of Rejected
     serializer_class = UsersListSerializers
     name = 'list'
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         uuid = self.request.user.id
