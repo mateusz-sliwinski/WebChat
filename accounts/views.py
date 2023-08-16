@@ -79,7 +79,7 @@ class UpdateFriendship(RetrieveUpdateAPIView):  # noqa D101
     def put(self, request, *args, **kwargs):
         if self.request.data.get('status') == 'Accepted':
             from_user = request.data['from_user']
-            to_user = request.data['from_user']
+            to_user = request.data['to_user']
             chat = Chat.objects.create()
             chat.save()
             Participant.objects.create(user=Users.objects.filter(id=from_user).get(), chat=chat)
