@@ -36,6 +36,8 @@ class FriendshipCreate(CreateAPIView):  # noqa D101
     def post(self, request, *args, **kwargs):
         one = request.data.get('from_user')
         two = request.data.get('to_user')
+        print(one)
+        print(two)
         qs = Friendship.objects.filter(Q(from_user__id=one) & Q(to_user__id=two) |
                                        Q(from_user__id=two) & Q(to_user__id=one))
         if qs.count() == 1:
@@ -80,6 +82,8 @@ class UpdateFriendship(RetrieveUpdateAPIView):  # noqa D101
         if self.request.data.get('status') == 'Accepted':
             from_user = request.data['from_user']
             to_user = request.data['to_user']
+            print(from_user)
+            print(to_user)
             chat = Chat.objects.create()
             chat.save()
             Participant.objects.create(user=Users.objects.filter(id=from_user).get(), chat=chat)

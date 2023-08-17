@@ -23,6 +23,7 @@ class ChatView(ListAPIView):
     def get_queryset(self):
         from_uuid = self.request.GET.get('from_uuid')
         to_uuid = self.request.GET.get('to_uuid')
+
         participants_from_user = Participant.objects.filter(user__id=from_uuid)
         participants_to_user = Participant.objects.filter(user__id=to_uuid)
         chat_id = None

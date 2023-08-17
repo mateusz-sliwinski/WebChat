@@ -7,9 +7,11 @@ from .models import ChatMessage, Chat, Participant
 from django.shortcuts import get_object_or_404
 from accounts.models import Users
 
+
 def get_user_contact(username, chatId):
     user = get_object_or_404(Users, username=username)
     return get_object_or_404(Participant, user=user, chat=chatId)
+
 
 def get_current_chat(chatId):
     return get_object_or_404(Chat, id=chatId)
@@ -18,7 +20,6 @@ def get_current_chat(chatId):
 class ChatConsumer(WebsocketConsumer):
 
     def fetch_messages(self, data):
-        print('fetch')
         chat_id = data['chatId']
         messages = ChatMessage.objects.all().filter(participant__chat_id=chat_id).order_by('timestamp')
         content = {
@@ -28,8 +29,7 @@ class ChatConsumer(WebsocketConsumer):
         self.send_message(content)
 
     def new_message(self, data):
-        print('new message')
-        author_user = get_user_contact(data['username'],data['chatId'])
+        author_user = get_user_contact(data['username'], data['chatId'])
         message = ChatMessage.objects.create(
             participant=author_user,
             content=data['content'])
@@ -37,7 +37,6 @@ class ChatConsumer(WebsocketConsumer):
             'command': 'new_message',
             'message': self.message_to_json(message)
         }
-
         return self.send_chat_message(content)
 
     def messages_to_json(self, messages):
@@ -59,7 +58,6 @@ class ChatConsumer(WebsocketConsumer):
     }
 
     def connect(self):
-        print('connect')
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'chat_%s' % self.room_name
         async_to_sync(self.channel_layer.group_add)(
@@ -75,7 +73,6 @@ class ChatConsumer(WebsocketConsumer):
         )
 
     def receive(self, text_data):
-        print('recive')
         data = json.loads(text_data)
         self.commands[data['command']](self, data)
 
