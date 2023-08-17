@@ -30,5 +30,4 @@ class ChatView(ListAPIView):
             for participant_to in participants_to_user:
                 if participant_from.chat == participant_to.chat:
                     chat_id = participant_from.chat.id
-
         return Chat.objects.filter(id=chat_id)
