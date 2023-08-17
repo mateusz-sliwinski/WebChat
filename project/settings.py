@@ -18,13 +18,17 @@ from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
 
+# Project
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from project import logger_formater
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-dotenv_path = os.path.join('.env')
+dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
+
 load_dotenv(dotenv_path)
 
 SECRET_KEY = str(os.getenv('SECRET_KEY'))
@@ -32,19 +36,25 @@ SECRET_KEY = str(os.getenv('SECRET_KEY'))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'accounts.apps.AccountsConfig',
     'board.apps.BoardConfig',
+    'chat.apps.ChatConfig',
+    'issue_tracking.apps.IssueTrackingConfig',
 
     'allauth',
     'allauth.account',
@@ -55,6 +65,8 @@ INSTALLED_APPS = [
     'dj_rest_auth',
     'dj_rest_auth.registration',
     'corsheaders',
+
+    'sslserver'
 ]
 
 MIDDLEWARE = [
@@ -88,8 +100,18 @@ TEMPLATES = [
     },
 ]
 
-
 WSGI_APPLICATION = 'project.wsgi.application'
+
+ASGI_APPLICATION = "project.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
@@ -113,6 +135,65 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console_formatter',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'log/app.log',
+            'formatter': 'file_formatter',
+        },
+    },
+    'formatters': {
+        'console_formatter': {
+            'format': '[%(levelname)s][CONSOLE][%(message)s]',
+            '()': logger_formater.CustomFormatter,
+        },
+        'file_formatter': {
+            'format': '[%(levelname)s][%(message)s]',
+            '()': logger_formater.CustomFormatter,
+        },
+    },
+    'root': {
+        'handlers': ['console', 'file'],
+        'level': 'WARNING',
+    },
+}
+
+LOGGING_ADMIN = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console_formatter',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'log/admin.log',
+            'formatter': 'file_formatter',
+        },
+    },
+    'formatters': {
+        'console_formatter': {
+            'format': '[%(levelname)s][CONSOLE][%(message)s]',
+            '()': logger_formater.CustomFormatter,
+        },
+        'file_formatter': {
+            'format': '[%(levelname)s][%(message)s]',
+            '()': logger_formater.CustomFormatter,
+        },
+    },
+    'root': {
+        'handlers': ['console', 'file'],
+        'level': 'INFO',
+    },
+}
 
 AUTHENTICATION_BACKENDS = [
     'project.admin_authentication_backend.CustomModelBackend',
@@ -127,16 +208,16 @@ REST_FRAMEWORK = {
     ],
 }
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('JWT',),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'AUTH_TOKEN_CLASSES': (
+        'rest_framework_simplejwt.tokens.AccessToken',
+    ),
 }
 
 CSRF_TRUSTED_ORIGINS = ['']
-OLD_PASSWORD_FIELD_ENABLED = True
-REST_USE_JWT = True
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-JWT_AUTH_COOKIE = 'access-token'
-JWT_AUTH_REFRESH_COOKIE = 'refresh-token'
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = (
@@ -144,13 +225,14 @@ CORS_ORIGIN_WHITELIST = (
     '',
 )
 
-FRONT_URL = 'http://127.0.0.1:8000/'
+FRONT_URL = 'http://localhost:4200/'
 
 REST_AUTH = {
     'LOGIN_SERIALIZER': 'accounts.serializers.LoginSerializer',
     'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
     'PASSWORD_RESET_SERIALIZER': 'accounts.serializers.CustomPasswordResetSerializer',
-    'PASSWORD_RESET_CONFIRM_SERIALIZER': 'accounts.serializers.CustomPasswordResetConfirmSerializer',
+    'PASSWORD_RESET_CONFIRM_SERIALIZER':
+        'accounts.serializers.CustomPasswordResetConfirmSerializer',
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer',
     'USE_JWT': True,
     'JWT_AUTH_COOKIE': 'access-token',
@@ -179,7 +261,6 @@ USE_TZ = True
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
-
 SITE_ID = 1
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'apps_static/')
@@ -193,7 +274,6 @@ ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
-
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # console or smtp
 EMAIL_HOST_USER = ''
@@ -209,7 +289,7 @@ DEFAULT_FROM_EMAIL = ''
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
+ADMIN_SITE_HEADER = 'WebChat Admin Panel'
 try:
     # Project
     from project.settings_local import *  # noqa: F401,F403

@@ -9,7 +9,7 @@ from project import settings
 
 class CustomAccountAdapter(DefaultAccountAdapter):  # noqa D101
 
-    def save_user(self, request, user, form, commit=False):  # noqa D102
+    def save_user(self, request, user, form, commit=False) -> object:  # noqa D102
         user = super().save_user(request, user, form, commit)
         count_user_first_name = Users.objects.filter(first_name=user.first_name).count()
         data = form.cleaned_data
@@ -20,9 +20,9 @@ class CustomAccountAdapter(DefaultAccountAdapter):  # noqa D101
         user.save()
         return user
 
-    def send_mail(self, template_prefix, email, context):  # noqa D102
+    def send_mail(self, template_prefix, email, context) -> None:  # noqa D102
         context['activate_url'] = settings.FRONT_URL + \
-                                  'account-confirm-email/' + context['key']
+                                  'activate-account/' + context['key']
 
         msg = self.render_mail(template_prefix, email, context)
         msg.send()
