@@ -20,7 +20,7 @@ from board.serializers import PostSerializer
 
 
 class PostList(ListCreateAPIView):
-    queryset = Post.objects.all()
+    queryset = Post.objects.all().order_by('-created')
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 

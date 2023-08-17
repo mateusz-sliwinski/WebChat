@@ -8,14 +8,15 @@ from board.models import Post
 from board.models import PostLikes
 
 
-class PostSerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.username')
+class PostSerializer(serializers.ModelSerializer):  # noqa: D101
+    owner = serializers.ReadOnlyField(source='owner.first_name')
+    owner_last_name = serializers.ReadOnlyField(source='owner.last_name')
     comments = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     like_post = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
-    class Meta:
+    class Meta:  # noqa: D106
         model = Post
-        fields = ['id', 'title', 'image', 'body', 'owner', 'comments', 'like_post']
+        fields = ['id', 'title', 'image', 'body', 'owner', 'owner_last_name', 'comments', 'like_post', 'created']
 
 
 class UsersPostSerializer(serializers.ModelSerializer):
@@ -28,7 +29,7 @@ class UsersPostSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.username')
+    owner = serializers.ReadOnlyField(source='owner.first_name')
 
     class Meta:
         model = Comment
