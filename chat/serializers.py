@@ -1,5 +1,7 @@
+# 3rd-party
 from rest_framework import serializers
 
+# Project
 from chat.models import Chat
 
 

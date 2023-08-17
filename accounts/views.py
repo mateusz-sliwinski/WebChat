@@ -7,7 +7,9 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.generics import ListAPIView
 from rest_framework.generics import RetrieveDestroyAPIView
 from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 # Project
 from accounts.models import Friendship
