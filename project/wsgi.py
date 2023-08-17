@@ -13,7 +13,6 @@ import os
 # Django
 from django.core.wsgi import get_wsgi_application
 
-# Project
 #from accounts.models import Users
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')

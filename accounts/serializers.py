@@ -166,3 +166,11 @@ class AddFriendshipSerializer(serializers.ModelSerializer):  # noqa D101
     class Meta:  # noqa D106
         model = Friendship
         fields = ['id', 'status', 'from_user', 'to_user']
+
+
+class UpdateFriendshipSerializer(serializers.ModelSerializer):  # noqa D101
+    from_user = UsersListSerializers()
+    to_user = UsersListSerializers()
+    class Meta:  # noqa D106
+        model = Friendship
+        fields = ['id', 'status', 'from_user', 'to_user']
