@@ -1,6 +1,10 @@
 # Django
 from django.contrib import admin
-from .models import ChatMessage, Participant, Chat
+
+# Local
+from .models import Chat
+from .models import ChatMessage
+from .models import Participant
 
 admin.site.register(ChatMessage)
 admin.site.register(Participant)

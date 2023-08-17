@@ -19,11 +19,8 @@ from dj_rest_auth.views import PasswordResetView
 from dj_rest_auth.views import UserDetailsView
 
 # Project
-from accounts.views import BlockedFriendship
-from accounts.views import DeleteFriendship
 from accounts.views import FriendshipCreate
 from accounts.views import GetUserFriendship
-from accounts.views import GetUserInformation
 from accounts.views import PendingFriendship
 from accounts.views import UpdateFriendship
 from accounts.views import UserList
@@ -107,26 +104,6 @@ urlpatterns = [
         PendingFriendship.as_view(),
         name='friends_pending',
     ),
-    # path(
-    #     'friends/blocked/',
-    #     BlockedFriendship.as_view(),
-    #     name='blocked_pending',
-    # ),
-    # path(
-    #     'friends/delete/<uuid:pk>',
-    #     DeleteFriendship.as_view(),
-    #     name='blocked_pending',
-    # ),
-    # path(
-    #     'friends/create/',
-    #     CreateFriendship.as_view(),
-    #     name='create',
-    # ),
-    # path(
-    #     'profile/<uuid:pk>',
-    #     GetUserInformation.as_view(),
-    #     name='profile',
-    # ),
     path(
         'friends/',
         FriendshipCreate.as_view(),

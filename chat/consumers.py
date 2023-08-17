@@ -1,11 +1,21 @@
 # chat/consumers.py
+# Standard Library
 import json
-from django.contrib.auth import get_user_model
+
+# Django
+from django.shortcuts import get_object_or_404
+
+# 3rd-party
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
-from .models import ChatMessage, Chat, Participant
-from django.shortcuts import get_object_or_404
+
+# Project
 from accounts.models import Users
+
+# Local
+from .models import Chat
+from .models import ChatMessage
+from .models import Participant
 
 
 def get_user_contact(username, chatId):

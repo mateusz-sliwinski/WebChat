@@ -1,16 +1,13 @@
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
-from django.shortcuts import get_object_or_404
+# Django
 from django.contrib.auth import get_user_model
-from rest_framework.generics import (
-    ListAPIView,
-    RetrieveAPIView,
-    CreateAPIView,
-    DestroyAPIView,
-    UpdateAPIView,
-)
+# 3rd-party
+from rest_framework.generics import ListAPIView
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
+# Local
+from .models import Chat
+from .models import Participant
 from .serializers import ChatSerializer
-from .models import Chat, Participant
 
 User = get_user_model()
 
@@ -18,7 +15,7 @@ User = get_user_model()
 class ChatView(ListAPIView):
     serializer_class = ChatSerializer
     name = 'room'
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         from_uuid = self.request.GET.get('from_uuid')
