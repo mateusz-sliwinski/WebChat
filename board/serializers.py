@@ -12,30 +12,33 @@ from board.models import PostLikes
 class PostSerializer(serializers.ModelSerializer):  # noqa: D101
     owner = serializers.ReadOnlyField(source='owner.first_name')
     owner_last_name = serializers.ReadOnlyField(source='owner.last_name')
+    owner_avatar = serializers.ImageField(source='owner.avatar')
     comments = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     like_post = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:  # noqa: D106
         model = Post
-        fields = ['id', 'title', 'image', 'body', 'owner', 'owner_last_name', 'comments', 'like_post', 'created']
+        fields = ['id', 'title', 'image', 'body', 'owner', 'owner_last_name', 'owner_avatar', 'comments', 'like_post', 'created']
 
 
 class UsersPostSerializer(serializers.ModelSerializer):  # noqa: D101
     posts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     comments = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    owner_avatar = serializers.ImageField(source='owner.avatar')
 
     class Meta:  # noqa: D106
         model = Users
-        fields = ['id', 'username', 'posts', 'comments']
+        fields = ['id', 'username', 'posts', 'comments', 'owner_avatar']
 
 
 class CommentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.first_name')
     owner_last_name = serializers.ReadOnlyField(source='owner.last_name')
+    owner_avatar = serializers.ImageField(source='owner.avatar')
 
     class Meta:  # noqa: D106
         model = Comment
-        fields = ['id', 'body', 'owner','owner_last_name', 'post']
+        fields = ['id', 'body', 'owner', 'owner_last_name', 'post', 'owner_avatar']
 
 
 class PostLikeSerializer(serializers.ModelSerializer):  # noqa: D101
