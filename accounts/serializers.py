@@ -44,7 +44,7 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):  # noqa D101
     class Meta(UserDetailsSerializer.Meta):  # noqa D102
         fields = UserDetailsSerializer.Meta.fields + \
                  (
-                     'is_staff', 'birth_date', 'first_name', 'last_name', 'password',
+                     'is_staff', 'birth_date', 'first_name', 'last_name', 'password', 'avatar'
                  )
 
 

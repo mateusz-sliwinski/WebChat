@@ -31,6 +31,7 @@ class Users(AbstractUser):  # noqa D100
         unique=True,
         verbose_name='ID',
     )
+    avatar = models.ImageField(blank=True, null=True)
     birth_date = models.DateField(blank=True, null=True)
 
     class Meta:  # noqa: D106
