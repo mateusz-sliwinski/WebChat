@@ -2,6 +2,7 @@
 # 3rd-party
 from rest_framework import status
 from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListAPIView
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
@@ -60,3 +61,14 @@ class LikeListCreate(APIView):  # noqa: D101
         else:
             PostLikes.objects.create(like_post=post, like_users=request.user)
         return Response(status=status.HTTP_201_CREATED)
+
+
+class LikesList(ListAPIView):
+    queryset = PostLikes.objects.all()
+    serializer_class = PostLikeSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self) -> dict:  # noqa D102
+        queryset = PostLikes.objects.filter(like_users=self.request.user.id)
+        return queryset
+
